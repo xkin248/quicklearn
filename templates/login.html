@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Login - QuickLearn{% endblock %}
+{% block content %}
+<div style="max-width:390px; margin:110px auto;background:#fff;padding:45px 38px;border-radius:20px;box-shadow:0 8px 38px rgba(45,78,152,.10);">
+    <h2 style="color:#2357bc;margin-bottom:20px;">Welcome to QuickLearn</h2>
+    <form method="post">
+        <input type="text" name="username" placeholder="Enter your name" required style="width:100%;padding:11px;font-size:18px;margin-bottom:18px;border-radius:8px;border:1px solid #e0ebfa;">
+        <button type="submit" style="width:100%;padding:13px;background:linear-gradient(90deg,#245cf1 70%,#2e88fc 100%);color:#fff;border:none;border-radius:10px;font-size:20px;font-weight:600;box-shadow:0 2px 10px #245cf112;">Login</button>
+    </form>
+</div>
+{% endblock %}
