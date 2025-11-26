@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Quiz{% endblock %}
+{% block content %}
+<div style="max-width:700px; margin:40px auto; padding:0 20px;">
+    <div class="card">
+        <span style="background:#eef4fa; color:#2357bc; padding:5px 12px; border-radius:20px; font-size:0.9em; font-weight:bold;">{{ q.subject }}</span>
+        <h2 style="margin-top:15px;">{{ q.question }}</h2>
+        <form action="{{ url_for('submit_quiz') }}" method="POST">
+            <input type="hidden" name="question_id" value="{{ q.id }}">
+            <div style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
+                {% for option in q.options %}
+                <label style="background:#f8f9fc; padding:15px; border-radius:12px; cursor:pointer; display:flex; align-items:center;">
+                    <input type="radio" name="option" value="{{ option }}" required style="margin-right:15px; transform:scale(1.2);">
+                    <span style="font-size:1.1em;">{{ option }}</span>
+                </label>
+                {% endfor %}
+            </div>
+            <button type="submit" style="width:100%; margin-top:30px; background:#245cf1; color:white; padding:14px; border-radius:10px; font-size:1.1em;">Submit</button>
+        </form>
+        <button onclick="document.getElementById('h').style.display='block'" style="background:none; color:#f59e0b; margin-top:20px; font-weight:bold;">💡 Need a hint?</button>
+        <div id="h" style="display:none; color:#666; margin-top:10px;">{{ q.hint }}</div>
+    </div>
+</div>
+{% endblock %}

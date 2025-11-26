@@ -1,20 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}QuickLearn{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#2357bc">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon.jpg') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="header">
         <div class="logo">QuickLearn</div>
-        <div>
+        <div style="display:flex; align-items:center;">
+            <div style="font-weight:bold; font-size:0.9em; margin-right:20px;">
+                <a href="{{ url_for('set_language', lang_code='en') }}" style="text-decoration:none; color:{% if lang=='en' %}#2357bc{% else %}#ccc{% endif %};">EN</a> | 
+                <a href="{{ url_for('set_language', lang_code='bm') }}" style="text-decoration:none; color:{% if lang=='bm' %}#2357bc{% else %}#ccc{% endif %};">BM</a>
+            </div>
             {% if session.get('username') %}
-                <span style="margin-right:16px;color:#2357bc;font-weight:600;">{{ session['username'] }}</span>
-                <a href="{{ url_for('logout') }}">
-                    <button class="logout-btn">Logout</button>
-                </a>
+                <span style="display:none; sm:inline-block; font-weight:bold; color:#2357bc;">{{ session['username'] }}</span>
+                <a href="{{ url_for('logout') }}"><button class="logout-btn">{{ t[lang]['logout'] }}</button></a>
             {% endif %}
         </div>
     </div>

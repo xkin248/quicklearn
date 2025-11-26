@@ -1,46 +1,45 @@
 {% extends "base.html" %}
-{% block title %}QuickLearn Dashboard{% endblock %}
+{% block title %}Dashboard{% endblock %}
 {% block content %}
 <div class="dashboard">
-    <h2 style="color:#2357bc;margin-bottom:26px;font-size:2.1em;">Welcome back!</h2>
+    <h2 style="color:#2357bc;">{{ t[lang]['welcome'] }}, {{ username }}!</h2>
     <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-size:1.06em;">Your Learning Level:</span>
-            <span style="font-size:1.3em;font-weight:700;color:#2357bc;">Level 2 / 3</span>
+        <div style="display:flex; justify-content:space-between;">
+            <span>{{ t[lang]['level'] }}</span>
+            <span style="font-weight:bold; color:#2357bc;">{{ t[lang]['level_text'] }} {{ level }}</span>
         </div>
-        <div style="display:flex;align-items:center;margin-top:14px;">
-            <div class="progress-bar-bg" style="width:330px;">
-                <div class="progress-bar" style="width:66%;"></div>
+        <div style="display:flex; align-items:center; margin-top:10px;">
+            <div class="progress-bar-bg" style="width:100%; margin-right:15px;">
+                <div class="progress-bar" style="width:{{ progress }}%;"></div>
             </div>
-            <span style="margin-left:10px;font-weight:bold;color:#245cf1;">66%</span>
+            <span style="font-weight:bold; color:#245cf1;">{{ xp }} XP</span>
         </div>
+        <p style="color:#888; font-size:0.9em;">{{ 100 - progress }} {{ t[lang]['next_level'] }} {{ level + 1 }}!</p>
     </div>
+
     <div class="cards-container">
         <div class="card card-blue">
-            <div style="font-size:1.1em;margin-bottom:8px;font-weight:700;">Today's Challenge</div>
-            <div>Start your first quiz for Level 2. Keep up your learning streak!</div>
-            <button>Start today's quiz</button>
-        </div>
-        <div class="card">
-            <div style="font-size:1.1em;margin-bottom:8px;font-weight:700;">Choose Subject</div>
-            <div>Browse all subjects</div>
-            <a href="{{ url_for('index') }}">
-                <button style="background:linear-gradient(90deg,#2357bc 70%,#2e88fc 100%);color:#fff;">Select</button>
+            <h3>{{ t[lang]['daily_challenge'] }}</h3>
+            <p>{{ t[lang]['math_desc'] }}</p>
+            <a href="{{ url_for('start_subject', subject_name='Mathematics') }}">
+                <button style="background:white; color:#245cf1; padding:10px 20px; border-radius:8px; font-weight:bold;">{{ t[lang]['start_math'] }}</button>
             </a>
         </div>
         <div class="card">
-            <div style="font-size:1.1em;margin-bottom:8px;font-weight:700;">Tasks & Rewards</div>
-            <div>Complete tasks for achievements</div>
+            <h3>{{ t[lang]['choose_subject'] }}</h3>
+            <p>{{ t[lang]['browse_subjects'] }}</p>
+            <a href="{{ url_for('index') }}"><button style="background:#2357bc; color:white; padding:10px 20px; border-radius:8px;">{{ t[lang]['select'] }}</button></a>
         </div>
         <div class="card">
-            <div style="font-size:1.1em;margin-bottom:8px;font-weight:700;">Learning History</div>
-            <div>Review your learning records</div>
+            <h3>{{ t[lang]['history'] }}</h3>
+            <p>{{ t[lang]['history_desc'] }}</p>
+            <a href="{{ url_for('history') }}">
+                <button style="background:#edf2fb; color:#3354ab; padding:8px 16px; border-radius:8px; margin-top:10px; font-weight:bold;">View History</button>
+            </a>
         </div>
-        <div class="card card-accent">
-            <div style="font-weight:bold;font-size:1.07em;margin-bottom:4px;">
-                Streak <br/>7 Days!
-            </div>
-            <div style="font-size:.99em;">Keep your focus and progress!</div>
+        <div class="card">
+            <h3>{{ t[lang]['streak'] }}</h3>
+            <p style="font-size:1.5em; font-weight:bold; color:#4caf50;">7 {{ t[lang]['days'] }}!</p>
         </div>
     </div>
 </div>

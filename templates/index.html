@@ -1,12 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Choose Subject - QuickLearn{% endblock %}
+{% block title %}Subjects{% endblock %}
 {% block content %}
-<div style="max-width:830px; margin:48px auto;">
-    <h2 style="color:#2357bc;margin-bottom:30px;">Which subject do you want to learn?</h2>
+<div style="max-width:830px; margin:48px auto; text-align:center;">
+    <h2 style="color:#2357bc; margin-bottom:30px;">{{ t[lang]['choose_subject'] }}</h2>
     <div class="subject-list">
         {% for subject in subjects %}
-        <button class="subject-card">{{ subject }}</button>
+        <a href="{{ url_for('start_subject', subject_name=subject) }}" style="text-decoration:none;">
+            <button class="subject-card">{{ subject }}</button>
+        </a>
         {% endfor %}
     </div>
+    <br><a href="{{ url_for('dashboard') }}" style="color:#666;">Back</a>
 </div>
 {% endblock %}
