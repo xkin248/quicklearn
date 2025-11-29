@@ -1,15 +1,152 @@
 {% extends "base.html" %}
-{% block title %}Subjects{% endblock %}
 {% block content %}
-<div style="max-width:830px; margin:48px auto; text-align:center;">
-    <h2 style="color:#2357bc; margin-bottom:30px;">{{ t[lang]['choose_subject'] }}</h2>
-    <div class="subject-list">
-        {% for subject in subjects %}
-        <a href="{{ url_for('start_subject', subject_name=subject) }}" style="text-decoration:none;">
-            <button class="subject-card">{{ subject }}</button>
-        </a>
-        {% endfor %}
-    </div>
-    <br><a href="{{ url_for('dashboard') }}" style="color:#666;">Back</a>
+<style>
+    .page-header {
+        margin-bottom: 24px;
+    }
+
+    .subject-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    transition: transform 0.2s,
+    border-color 0.2s;
+    }
+
+    .subject-card:active {
+        transform: scale(0.96);
+    }
+
+    /* Unique gradients for cards based on nth-child logic (simulated with classes or just inline styles if dynamic) */
+    .subject-card:nth-child(1) .icon-bg {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .subject-card:nth-child(2) .icon-bg {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .subject-card:nth-child(3) .icon-bg {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    .subject-card:nth-child(4) .icon-bg {
+        background: linear-gradient(135deg, #ec4899, #db2777);
+    }
+
+    .icon-bg {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        /* Default */
+    }
+
+    .subject-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .subject-count {
+            {
+            % extends "base.html" %
+        }
+
+            {
+            % block content %
+        }
+
+        <style>.page-header {
+            margin-bottom: 24px;
+        }
+
+        .subject-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        transition: transform 0.2s,
+        border-color 0.2s;
+    }
+
+    .subject-card:active {
+        transform: scale(0.96);
+    }
+
+    /* Unique gradients for cards based on nth-child logic (simulated with classes or just inline styles if dynamic) */
+    .subject-card:nth-child(1) .icon-bg {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .subject-card:nth-child(2) .icon-bg {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .subject-card:nth-child(3) .icon-bg {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    .subject-card:nth-child(4) .icon-bg {
+        background: linear-gradient(135deg, #ec4899, #db2777);
+    }
+
+    .icon-bg {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        /* Default */
+    }
+
+    .subject-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .subject-count {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+</style>
+
+<div class="page-header animate-fade-in">
+    <h2 style="margin: 0; font-size: 28px; font-weight: 700;">{{ t.explore }}</h2>
+    <p style="margin: 4px 0 0 0; color: var(--text-muted);">{{ t.choose_subject }}</p>
 </div>
+
+<div class="subject-grid animate-fade-in" style="animation-delay: 0.1s;">
+    {% for subject in subjects %}
+    <a href="{{ url_for('start_subject', subject_name=subject) }}" class="subject-card">
+        <div class="icon-bg">
+            {% if subject == 'Mathematics' %}📐
+            {% elif subject == 'Science' %}🧬
+            {% elif subject == 'History' %}🏛️
+            {% elif subject == 'English' %}📖
+            {% else %}📚{% endif %}
+        </div>
+        <div class="subject-title">{{ subject }}</div>
+        <div class="subject-count">{{ t.start_quiz }}</div>
+    </a>
+    {% endfor %}
+</div>
+
+<div style="height: 40px;"></div>
 {% endblock %}

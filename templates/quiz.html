@@ -1,24 +1,133 @@
 {% extends "base.html" %}
-{% block title %}Quiz{% endblock %}
+
 {% block content %}
-<div style="max-width:700px; margin:40px auto; padding:0 20px;">
-    <div class="card">
-        <span style="background:#eef4fa; color:#2357bc; padding:5px 12px; border-radius:20px; font-size:0.9em; font-weight:bold;">{{ q.subject }}</span>
-        <h2 style="margin-top:15px;">{{ q.question }}</h2>
-        <form action="{{ url_for('submit_quiz') }}" method="POST">
-            <input type="hidden" name="question_id" value="{{ q.id }}">
-            <div style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
-                {% for option in q.options %}
-                <label style="background:#f8f9fc; padding:15px; border-radius:12px; cursor:pointer; display:flex; align-items:center;">
-                    <input type="radio" name="option" value="{{ option }}" required style="margin-right:15px; transform:scale(1.2);">
-                    <span style="font-size:1.1em;">{{ option }}</span>
-                </label>
-                {% endfor %}
-            </div>
-            <button type="submit" style="width:100%; margin-top:30px; background:#245cf1; color:white; padding:14px; border-radius:10px; font-size:1.1em;">Submit</button>
-        </form>
-        <button onclick="document.getElementById('h').style.display='block'" style="background:none; color:#f59e0b; margin-top:20px; font-weight:bold;">💡 Need a hint?</button>
-        <div id="h" style="display:none; color:#666; margin-top:10px;">{{ q.hint }}</div>
-    </div>
+<style>
+    /* Question Card */
+    .quiz-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 32px 24px;
+        margin-bottom: 24px;
+        position: relative;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .subject-badge {
+        display: inline-block;
+        background: rgba(99, 102, 241, 0.2);
+        color: #818cf8;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 16px;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .question-text {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 1.5;
+        margin: 0 0 24px 0;
+        color: var(--text-main);
+    }
+
+    /* Lives Indicator */
+    .lives-wrapper {
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        display: flex;
+        gap: 6px;
+    }
+
+    .heart {
+        font-size: 18px;
+        opacity: 0.2;
+        transition: opacity 0.3s;
+    }
+
+    .heart.active {
+        color: #ef4444;
+        opacity: 1;
+        text-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+    }
+
+    /* Hint Box */
+    .hint-box {
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        color: #fbbf24;
+        padding: 16px;
+        border-radius: 16px;
+        margin-top: 24px;
+        font-size: 14px;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        animation: fadeIn 0.5s ease;
+    }
+
+    /* Options Grid */
+    .options-grid {
+        display: grid;
+        gap: 12px;
+    }
+
+    .option-btn {
+        width: 100%;
+        padding: 20px;
+        background: rgba(30, 41, 59, 0.6);
+        color: var(--text-main);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        font-size: 16px;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .option-btn:hover {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: rgba(99, 102, 241, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .option-btn:active {
+        transform: scale(0.98);
+        background: rgba(99, 102, 241, 0.2);
+    }
+
+    .attempt-counter {
+        text-align: center;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 16px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+</style>
+
+<div class="attempt-counter">
+    Question {{ q.id }} &bull; Attempt {{ attempts + 1 }} / 3
 </div>
+{% for option in q.get_options() %}
+<label class="option-card">
+    <input type="radio" name="option" value="{{ option }}" required>
+    <span class="option-text">{{ option }}</span>
+</label>
+{% endfor %}
+</div>
+
+<button type="submit" class="btn-submit">{{ t.submit }}</button>
+</form>
+
+<div style="height: 40px;"></div>
 {% endblock %}

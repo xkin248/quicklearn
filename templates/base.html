@@ -1,29 +1,250 @@
 <!DOCTYPE html>
-<html lang="{{ lang }}">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}QuickLearn{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#2357bc">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon.jpg') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>QuickLearn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- GLOBAL THEME VARIABLES --- */
+        :root {
+            /* Light Theme (Default) */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #2563eb;
+            --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --nav-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --primary: #6366f1;
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --nav-bg: #1e293b;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 0;
+            padding-bottom: 100px;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            padding: 24px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* --- COMPONENTS --- */
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: background 0.3s, border 0.3s;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-gradient);
+            color: white;
+            text-align: center;
+            border-radius: 16px;
+            text-decoration: none;
+            border: none;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* --- BOTTOM NAVIGATION --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--nav-bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            padding: 12px 0 24px 0;
+            z-index: 1000;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+            transition: background 0.3s, border 0.3s;
+        }
+
+        .nav-inner {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 2px;
+        }
+
+        /* --- SETTINGS TOGGLES (Floating) --- */
+        .settings-float {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1001;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            color: var(--text-main);
+            transition: transform 0.2s;
+        }
+
+        .icon-btn:active {
+            transform: scale(0.9);
+        }
+    </style>
 </head>
+
 <body>
-    <div class="header">
-        <div class="logo">QuickLearn</div>
-        <div style="display:flex; align-items:center;">
-            <div style="font-weight:bold; font-size:0.9em; margin-right:20px;">
-                <a href="{{ url_for('set_language', lang_code='en') }}" style="text-decoration:none; color:{% if lang=='en' %}#2357bc{% else %}#ccc{% endif %};">EN</a> | 
-                <a href="{{ url_for('set_language', lang_code='bm') }}" style="text-decoration:none; color:{% if lang=='bm' %}#2357bc{% else %}#ccc{% endif %};">BM</a>
-            </div>
-            {% if session.get('username') %}
-                <span style="display:none; sm:inline-block; font-weight:bold; color:#2357bc;">{{ session['username'] }}</span>
-                <a href="{{ url_for('logout') }}"><button class="logout-btn">{{ t[lang]['logout'] }}</button></a>
-            {% endif %}
-        </div>
+
+    <!-- SETTINGS TOGGLES -->
+    <div class="settings-float">
+        <button class="icon-btn" onclick="toggleLanguage()" title="Switch Language">🌐</button>
+        <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme">🌓</button>
     </div>
-    {% block content %}{% endblock %}
+
+    <div class="container animate-fade-in">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div
+            style="padding: 16px; background: rgba(239, 68, 68, 0.1); color: #ef4444; margin-bottom: 24px; border-radius: 16px; font-size: 14px; border: 1px solid rgba(239, 68, 68, 0.2); display: flex; align-items: center; gap: 10px;">
+            <span>⚠️</span> {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    {% if session.get('user_id') %}
+    <nav class="bottom-nav">
+        <div class="nav-inner">
+            <a href="{{ url_for('dashboard') }}"
+                class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <span class="nav-icon">🏠</span>
+                {{ t.home }}
+            </a>
+            <a href="{{ url_for('index') }}"
+                class="nav-item {% if request.endpoint == 'index' or 'start_subject' in request.endpoint %}active{% endif %}">
+                <span class="nav-icon">📚</span>
+                {{ t.subjects }}
+            </a>
+            <a href="{{ url_for('settings') }}"
+                class="nav-item {% if request.endpoint == 'settings' %}active{% endif %}">
+                <span class="nav-icon">👤</span>
+                {{ t.profile }}
+            </a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <script>
+        // THEME TOGGLE LOGIC
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        }
+
+        // LANGUAGE TOGGLE LOGIC (Real)
+        function toggleLanguage() {
+            const current = "{{ lang }}";
+            const next = current === 'en' ? 'bm' : 'en';
+            window.location.href = "/set_language/" + next;
+        }
+
+        // Initialize Theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
 </body>
+
 </html>

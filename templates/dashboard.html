@@ -1,46 +1,325 @@
 {% extends "base.html" %}
-{% block title %}Dashboard{% endblock %}
+
 {% block content %}
-<div class="dashboard">
-    <h2 style="color:#2357bc;">{{ t[lang]['welcome'] }}, {{ username }}!</h2>
-    <div class="card">
-        <div style="display:flex; justify-content:space-between;">
-            <span>{{ t[lang]['level'] }}</span>
-            <span style="font-weight:bold; color:#2357bc;">{{ t[lang]['level_text'] }} {{ level }}</span>
-        </div>
-        <div style="display:flex; align-items:center; margin-top:10px;">
-            <div class="progress-bar-bg" style="width:100%; margin-right:15px;">
-                <div class="progress-bar" style="width:{{ progress }}%;"></div>
+<style>
+    .header-section {
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .header-subtitle {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+
+    /* BIG BLUE CARD CONTAINER */
+    .big-card {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        border-radius: 32px;
+        padding: 24px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+        position: relative;
+        overflow: hidden;
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Top Section: Mastery */
+    .mastery-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .mastery-label {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        opacity: 0.9;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .level-display {
+        font-size: 36px;
+        font-weight: 700;
+    }
+
+    .streak-badge {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(4px);
+        padding: 8px 16px;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 60px;
+    }
+
+    .progress-track {
+        background: rgba(255, 255, 255, 0.2);
+        height: 10px;
+        border-radius: 5px;
+        margin-bottom: 32px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .progress-fill {
+        background: white;
+        height: 100%;
+        border-radius: 5px;
+
+        width: {
+                {
+                user.xp % 100
+            }
+        }
+
+        %;
+    }
+
+    /* Inner Buttons Section */
+    .inner-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        flex: 1;
+    }
+
+    .inner-btn {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 16px;
+        transition: transform 0.2s, background 0.2s;
+    }
+
+    .inner-btn:active {
+        transform: scale(0.98);
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .inner-btn.white-bg {
+        background: white;
+        color: #2563eb;
+    }
+
+        {
+        % extends "base.html" %
+    }
+
+        {
+        % block content %
+    }
+
+    <style>.header-section {
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .header-subtitle {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+
+    /* BIG BLUE CARD CONTAINER */
+    .big-card {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        border-radius: 32px;
+        padding: 24px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+        position: relative;
+        overflow: hidden;
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Top Section: Mastery */
+    .mastery-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .mastery-label {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        opacity: 0.9;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .level-display {
+        font-size: 36px;
+        font-weight: 700;
+    }
+
+    .streak-badge {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(4px);
+        padding: 8px 16px;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 60px;
+    }
+
+    .progress-track {
+        background: rgba(255, 255, 255, 0.2);
+        height: 10px;
+        border-radius: 5px;
+        margin-bottom: 32px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .progress-fill {
+        background: white;
+        height: 100%;
+        border-radius: 5px;
+
+        width: {
+                {
+                user.xp % 100
+            }
+        }
+
+        %;
+    }
+
+    /* Inner Buttons Section */
+    .inner-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        flex: 1;
+    }
+
+    .inner-btn {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 16px;
+        transition: transform 0.2s, background 0.2s;
+    }
+
+    .inner-btn:active {
+        transform: scale(0.98);
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .inner-btn.white-bg {
+        background: white;
+        color: #2563eb;
+    }
+
+    .btn-icon {
+        font-size: 20px;
+    }
+</style>
+
+<div class="header-section animate-fade-in">
+    <div>
+        <h1 class="header-title">{{ t.hello }}, {{ user.username }}! 👋</h1>
+        <p class="header-subtitle">{{ t.ready_msg }}</p>
+    </div>
+    <div
+        style="width: 48px; height: 48px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+        👤
+    </div>
+</div>
+
+<div class="big-card animate-fade-in">
+    <!-- Top: Mastery Info -->
+    <div class="mastery-header">
+        <div>
+            <div class="mastery-label">{{ t.current_mastery }}</div>
+            <div class="level-display">{{ t.level }} {{ (user.xp // 100) + 1 }} <span
+                    style="font-size: 18px; opacity: 0.7;">/
+                    10</span></div>
+            <div style="font-size: 12px; margin-top: 4px; opacity: 0.9;">{{ t.progress_to }} {{ (user.xp // 100) + 2 }}
             </div>
-            <span style="font-weight:bold; color:#245cf1;">{{ xp }} XP</span>
         </div>
-        <p style="color:#888; font-size:0.9em;">{{ 100 - progress }} {{ t[lang]['next_level'] }} {{ level + 1 }}!</p>
+        <div class="streak-badge">
+            <span style="font-size: 20px;">🔥</span>
+            <span style="font-size: 11px; font-weight: 700; margin-top: 2px;">{{ user.get_current_streak() }}
+                {{ t.days }}</span>
+        </div>
     </div>
 
-    <div class="cards-container">
-        <div class="card card-blue">
-            <h3>{{ t[lang]['daily_challenge'] }}</h3>
-            <p>{{ t[lang]['math_desc'] }}</p>
-            <a href="{{ url_for('start_subject', subject_name='Mathematics') }}">
-                <button style="background:white; color:#245cf1; padding:10px 20px; border-radius:8px; font-weight:bold;">{{ t[lang]['start_math'] }}</button>
-            </a>
+    <!-- Progress Bar -->
+    <div style="display: flex; justify-content: flex-end; font-size: 12px; margin-bottom: 6px; opacity: 0.9;">
+        {{ user.xp % 100 }}/100 {{ t.xp }}
+    </div>
+    <div class="progress-track">
+        <div class="progress-fill"></div>
+    </div>
+
+    <!-- Inner Buttons -->
+    <div class="inner-buttons">
+        <!-- Missions (Placeholder) -->
+        <div class="inner-btn">
+            <span class="btn-icon">🎯</span> {{ t.missions }}
         </div>
-        <div class="card">
-            <h3>{{ t[lang]['choose_subject'] }}</h3>
-            <p>{{ t[lang]['browse_subjects'] }}</p>
-            <a href="{{ url_for('index') }}"><button style="background:#2357bc; color:white; padding:10px 20px; border-radius:8px;">{{ t[lang]['select'] }}</button></a>
-        </div>
-        <div class="card">
-            <h3>{{ t[lang]['history'] }}</h3>
-            <p>{{ t[lang]['history_desc'] }}</p>
-            <a href="{{ url_for('history') }}">
-                <button style="background:#edf2fb; color:#3354ab; padding:8px 16px; border-radius:8px; margin-top:10px; font-weight:bold;">View History</button>
-            </a>
-        </div>
-        <div class="card">
-            <h3>{{ t[lang]['streak'] }}</h3>
-            <p style="font-size:1.5em; font-weight:bold; color:#4caf50;">7 {{ t[lang]['days'] }}!</p>
+
+        <!-- History (White Button) -->
+        <a href="{{ url_for('history') }}" class="inner-btn white-bg">
+            <span class="btn-icon">🕒</span> {{ t.history }}
+        </a>
+
+        <!-- Stats (Placeholder) -->
+        <div class="inner-btn">
+            <span class="btn-icon">📊</span> {{ t.stats }}
         </div>
     </div>
 </div>
+
+<div style="height: 40px;"></div>
 {% endblock %}

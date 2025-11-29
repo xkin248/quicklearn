@@ -1,16 +1,61 @@
 {% extends "base.html" %}
-{% block title %}Result{% endblock %}
+
 {% block content %}
-<div style="max-width:600px; margin:50px auto; text-align:center; padding:0 20px;">
-    <div class="card" style="border-top: 6px solid {% if is_correct %}#4caf50{% else %}#ff5252{% endif %};">
-        <div style="font-size:4em;">{% if is_correct %}🎉{% else %}🤔{% endif %}</div>
-        <h2>{% if is_correct %}Correct! +20 XP{% else %}Not quite...{% endif %}</h2>
-        {% if not is_correct %}<p>Answer: <strong>{{ answer }}</strong></p>{% endif %}
-        <div style="background:#f0f7ff; padding:20px; border-radius:15px; text-align:left; margin-top:20px;">
-            <div style="font-weight:bold; color:#2357bc;">🤖 AI Tutor Explanation</div>
-            <p>{{ explanation }}</p>
-        </div>
-        <a href="{{ url_for('dashboard') }}"><button style="margin-top:20px; background:#edf2fb; color:#3354ab; padding:10px 20px; border-radius:8px;">Back to Dashboard</button></a>
-    </div>
-</div>
+<style>
+    .result-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 40px 24px;
+        text-align: center;
+        margin-bottom: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-icon {
+        font-size: 80px;
+        margin-bottom: 24px;
+        display: block;
+        animation: pulse 2s infinite;
+    }
+
+    .explanation-box {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 24px;
+        text-align: left;
+        margin-top: 32px;
+        border-left: 4px solid var(--primary);
+    }
+
+    .explanation-title {
+        font-size: 12px;
+        color: var(--text-muted);
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        letter-spacing: 1px;
+    }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        margin-top: 16px;
+    }
+</style>
+
+<a href="{{ url_for('quiz', id=question_id) }}" class="btn animate-fade-in"
+    style="background: linear-gradient(135deg, #f59e0b, #d97706); animation-delay: 0.1s;">
+    🔄 Retry Question
+</a>
+{% endif %}
+
+<a href="{{ url_for('dashboard') }}" class="btn {% if not is_correct %}btn-secondary{% endif %} animate-fade-in"
+    style="animation-delay: 0.2s;">
+    {% if is_correct %}Continue Learning{% else %}Back to Dashboard{% endif %}
+</a>
+
+<div style="height: 40px;"></div>
 {% endblock %}

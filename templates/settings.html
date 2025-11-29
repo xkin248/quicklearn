@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .menu-item { display: flex; justify-content: space-between; padding: 16px; background: #1e293b; border-bottom: 1px solid #334155; text-decoration: none; color: white; }
+    .menu-group { border-radius: 16px; overflow: hidden; margin-bottom: 20px; border: 1px solid #334155; }
+</style>
+<h2 style="margin-bottom: 20px;">Settings</h2>
+<div class="menu-group">
+    <a href="{{ url_for('set_language', lang_code='en') }}" class="menu-item"><span>🇺🇸 English</span><span>›</span></a>
+    <a href="{{ url_for('set_language', lang_code='bm') }}" class="menu-item"><span>🇲🇾 Bahasa Melayu</span><span>›</span></a>
+</div>
+<div class="menu-group">
+    <a href="{{ url_for('history') }}" class="menu-item"><span>↺ Learning History</span><span>›</span></a>
+</div>
+<a href="{{ url_for('logout') }}" class="btn" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444;">Log Out</a>
+{% endblock %}

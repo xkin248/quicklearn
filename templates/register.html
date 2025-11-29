@@ -1,16 +1,75 @@
 {% extends "base.html" %}
-{% block title %}Register{% endblock %}
 {% block content %}
-<div style="height:80vh; display:flex; align-items:center; justify-content:center;">
-    <div class="card" style="width:100%; max-width:400px; text-align:center;">
-        <h2 style="color:#2357bc;">Sign Up</h2>
-        {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
-        <form method="POST">
-            <input type="text" name="username" placeholder="Username" required style="width:90%; padding:12px; margin-bottom:15px; border:2px solid #e3ecfa; border-radius:10px;">
-            <input type="password" name="password" placeholder="Password" required style="width:90%; padding:12px; margin-bottom:20px; border:2px solid #e3ecfa; border-radius:10px;">
-            <button type="submit" style="width:100%; padding:12px; background:#2357bc; color:white; border-radius:10px; font-weight:bold;">Register</button>
-        </form>
-        <p><a href="{{ url_for('login') }}" style="color:#666;">Back to Login</a></p>
+<style>
+    .auth-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 40px 32px;
+        margin-top: 60px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    input {
+        width: 100%;
+        padding: 16px;
+        border-radius: 16px;
+        background: rgba(15, 23, 42, 0.6);
+        color: white;
+        border: 1px solid var(--border);
+        margin-bottom: 20px;
+        box-sizing: border-box;
+        font-size: 16px;
+        transition: border-color 0.2s;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: rgba(15, 23, 42, 0.8);
+    }
+
+    label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
+
+<div class="auth-card animate-fade-in">
+    <div style="text-align: center; margin-bottom: 32px;">
+        <div style="font-size: 40px; margin-bottom: 16px;">🚀</div>
+        <h2 style="margin: 0; font-size: 24px;">Create Account</h2>
+        <p style="margin: 8px 0 0 0; color: var(--text-muted); font-size: 14px;">Start your learning journey</p>
+    </div>
+
+    {% if error %}
+    <div
+        style="background: rgba(239, 68, 68, 0.1); color: #fca5a5; padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 24px; font-size: 14px; border: 1px solid rgba(239, 68, 68, 0.2);">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST">
+        <label>Choose Username</label>
+        <input type="text" name="username" required placeholder="Pick a username">
+
+        <label>Choose Password</label>
+        <input type="password" name="password" required placeholder="Create a password">
+
+        <button type="submit" class="btn">Register</button>
+    </form>
+
+    <div style="text-align: center; margin-top: 24px; font-size: 14px;">
+        <span style="color: var(--text-muted);">Already have an account?</span>
+        <a href="{{ url_for('login') }}"
+            style="color: var(--primary); text-decoration: none; font-weight: 600; margin-left: 4px;">Login Here</a>
     </div>
 </div>
 {% endblock %}
