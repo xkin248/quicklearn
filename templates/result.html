@@ -1,61 +1,40 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-    .result-card {
-        background: var(--bg-card);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid var(--border);
-        border-radius: 24px;
-        padding: 40px 24px;
-        text-align: center;
-        margin-bottom: 24px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    }
+<div class="container" style="max-width: 600px; text-align: center;">
+    <div class="card" style="padding: 40px;">
+        
+        <div style="font-size: 60px; margin-bottom: 20px;">
+            {{ '🎉' if is_correct else '💪' }}
+        </div>
 
-    .status-icon {
-        font-size: 80px;
-        margin-bottom: 24px;
-        display: block;
-        animation: pulse 2s infinite;
-    }
+        <h1 style="color: {{ 'var(--success)' if is_correct else 'var(--danger)' }}; margin-bottom: 10px;">
+            {{ t['correct'] if is_correct else t['incorrect'] }}
+        </h1>
 
-    .explanation-box {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 16px;
-        padding: 24px;
-        text-align: left;
-        margin-top: 32px;
-        border-left: 4px solid var(--primary);
-    }
+        <p style="font-size: 18px; color: var(--text-muted); margin-bottom: 30px;">
+            {% if is_correct %}
+                Great job! You earned XP.
+            {% else %}
+                Don't worry, keep practicing!
+            {% endif %}
+        </p>
 
-    .explanation-title {
-        font-size: 12px;
-        color: var(--text-muted);
-        font-weight: 700;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-        letter-spacing: 1px;
-    }
+        <div style="background: rgba(99,102,241,0.1); padding: 20px; border-radius: 12px; text-align: left; margin-bottom: 30px;">
+            <div style="font-weight: bold; color: var(--primary); margin-bottom: 5px;">{{ t['explanation'] }}:</div>
+            <div style="color: var(--text-main);">{{ explanation }}</div>
+        </div>
 
-    .btn-secondary {
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        margin-top: 16px;
-    }
-</style>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <a href="{{ url_for('dashboard') }}" class="btn-secondary">{{ t['home'] }}</a>
+            
+            {% if not is_correct %}
+                <a href="{{ url_for('quiz', id=question_id) }}" class="btn-primary">Try Again</a>
+            {% else %}
+                <a href="{{ url_for('start_random') }}" class="btn-primary">{{ t['next'] }} ➡️</a>
+            {% endif %}
+        </div>
 
-<a href="{{ url_for('quiz', id=question_id) }}" class="btn animate-fade-in"
-    style="background: linear-gradient(135deg, #f59e0b, #d97706); animation-delay: 0.1s;">
-    🔄 Retry Question
-</a>
-{% endif %}
-
-<a href="{{ url_for('dashboard') }}" class="btn {% if not is_correct %}btn-secondary{% endif %} animate-fade-in"
-    style="animation-delay: 0.2s;">
-    {% if is_correct %}Continue Learning{% else %}Back to Dashboard{% endif %}
-</a>
-
-<div style="height: 40px;"></div>
+    </div>
+</div>
 {% endblock %}

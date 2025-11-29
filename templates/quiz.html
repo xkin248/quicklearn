@@ -1,133 +1,39 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-    /* Question Card */
-    .quiz-card {
-        background: var(--bg-card);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid var(--border);
-        border-radius: 24px;
-        padding: 32px 24px;
-        margin-bottom: 24px;
-        position: relative;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    }
+<div class="container" style="max-width: 800px;">
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <span style="color: var(--accent); font-weight: bold;">{{ q.subject }}</span>
+            <span style="color: var(--text-muted);">Difficulty: {{ q.difficulty }}</span>
+        </div>
 
-    .subject-badge {
-        display: inline-block;
-        background: rgba(99, 102, 241, 0.2);
-        color: #818cf8;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 16px;
-        border: 1px solid rgba(99, 102, 241, 0.3);
-    }
+        <h2 style="font-size: 24px; margin-bottom: 30px;">{{ q.question_text }}</h2>
 
-    .question-text {
-        font-size: 20px;
-        font-weight: 600;
-        line-height: 1.5;
-        margin: 0 0 24px 0;
-        color: var(--text-main);
-    }
+        <form action="{{ url_for('submit_quiz') }}" method="POST">
+            <input type="hidden" name="question_id" value="{{ q.id }}">
 
-    /* Lives Indicator */
-    .lives-wrapper {
-        position: absolute;
-        top: 24px;
-        right: 24px;
-        display: flex;
-        gap: 6px;
-    }
+            <label class="option-label">
+                <input type="radio" name="option" value="{{ q.option_a }}" required> {{ q.option_a }}
+            </label>
+            <label class="option-label">
+                <input type="radio" name="option" value="{{ q.option_b }}" required> {{ q.option_b }}
+            </label>
+            <label class="option-label">
+                <input type="radio" name="option" value="{{ q.option_c }}" required> {{ q.option_c }}
+            </label>
+            <label class="option-label">
+                <input type="radio" name="option" value="{{ q.option_d }}" required> {{ q.option_d }}
+            </label>
 
-    .heart {
-        font-size: 18px;
-        opacity: 0.2;
-        transition: opacity 0.3s;
-    }
+            <button type="submit" class="btn-primary" style="margin-top: 20px;">{{ t['submit'] }}</button>
+        </form>
 
-    .heart.active {
-        color: #ef4444;
-        opacity: 1;
-        text-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
-    }
-
-    /* Hint Box */
-    .hint-box {
-        background: rgba(245, 158, 11, 0.1);
-        border: 1px solid rgba(245, 158, 11, 0.3);
-        color: #fbbf24;
-        padding: 16px;
-        border-radius: 16px;
-        margin-top: 24px;
-        font-size: 14px;
-        display: flex;
-        gap: 12px;
-        align-items: flex-start;
-        animation: fadeIn 0.5s ease;
-    }
-
-    /* Options Grid */
-    .options-grid {
-        display: grid;
-        gap: 12px;
-    }
-
-    .option-btn {
-        width: 100%;
-        padding: 20px;
-        background: rgba(30, 41, 59, 0.6);
-        color: var(--text-main);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        font-size: 16px;
-        text-align: left;
-        cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .option-btn:hover {
-        background: rgba(99, 102, 241, 0.1);
-        border-color: rgba(99, 102, 241, 0.4);
-        transform: translateY(-2px);
-    }
-
-    .option-btn:active {
-        transform: scale(0.98);
-        background: rgba(99, 102, 241, 0.2);
-    }
-
-    .attempt-counter {
-        text-align: center;
-        font-size: 12px;
-        color: var(--text-muted);
-        margin-bottom: 16px;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-    }
-</style>
-
-<div class="attempt-counter">
-    Question {{ q.id }} &bull; Attempt {{ attempts + 1 }} / 3
+        {% if attempts > 0 %}
+        <div style="margin-top: 20px; color: var(--danger); text-align: center;">
+            ⚠️ {{ attempts }} failed attempt(s).
+        </div>
+        {% endif %}
+    </div>
 </div>
-{% for option in q.get_options() %}
-<label class="option-card">
-    <input type="radio" name="option" value="{{ option }}" required>
-    <span class="option-text">{{ option }}</span>
-</label>
-{% endfor %}
-</div>
-
-<button type="submit" class="btn-submit">{{ t.submit }}</button>
-</form>
-
-<div style="height: 40px;"></div>
 {% endblock %}
