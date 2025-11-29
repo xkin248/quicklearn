@@ -26,12 +26,12 @@
         </div>
 
         <div style="display: flex; gap: 10px; justify-content: center;">
-            <a href="{{ url_for('dashboard') }}" class="btn-secondary">{{ t['home'] }}</a>
+            <a href="{{ url_for('main.dashboard') }}" class="btn-secondary">{{ t['home'] }}</a>
             
             {% if not is_correct %}
-                <a href="{{ url_for('quiz', id=question_id) }}" class="btn-primary">Try Again</a>
+                <a href="{{ url_for('quiz.quiz', id=question_id) }}" class="btn-primary">Try Again</a>
             {% else %}
-                <a href="{{ url_for('start_random') }}" class="btn-primary">{{ t['next'] }} ➡️</a>
+                <a href="{{ url_for('quiz.start_random') }}" class="btn-primary">{{ t['next'] }} ➡️</a>
             {% endif %}
         </div>
 

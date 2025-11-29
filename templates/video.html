@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container" style="max-width: 800px;">
     <div class="card">
-        <a href="{{ url_for('dashboard') }}" style="color: var(--text-muted); text-decoration: none; font-size: 14px; display: block; margin-bottom: 15px;">
+        <a href="{{ url_for('main.dashboard') }}" style="color: var(--text-muted); text-decoration: none; font-size: 14px; display: block; margin-bottom: 15px;">
             ← {{ t['back_home'] }}
         </a>
 
@@ -19,7 +19,7 @@
 
         <div style="text-align: center;">
             <p style="margin-bottom: 20px;">Watch the video to understand the topic, then try the quiz!</p>
-            <a href="{{ url_for('quiz', id=q.id) }}" class="btn-primary" style="padding: 15px 30px; font-size: 18px;">
+            <a href="{{ url_for('quiz.quiz', id=q.id) }}" class="btn-primary" style="padding: 15px 30px; font-size: 18px;">
                 {{ t['proceed_to_question'] }} 👉
             </a>
         </div>

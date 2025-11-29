@@ -1,5 +1,7 @@
+# List of available subjects
 subjects = ['Mathematics', 'Science', 'History', 'English']
 
+# UI Translations
 translations = {
     'en': {
         'welcome': "Welcome", 'hello': "Hello", 'ready_msg': "Ready to level up today?",
@@ -21,6 +23,6 @@ translations = {
         'start_quiz': "Mula Kuiz", 'question': "Soalan", 'submit': "Hantar", 'next': "Seterusnya",
         'correct': "Betul!", 'incorrect': "Salah!", 'explanation': "Penerangan",
         'back_home': "Kembali ke Utama", 'attempts_left': "percubaan tinggal",
-        'watch_video': "Tonton Video", 'proceed_to_question': "Teruskan ke Soalan"
+        'watch_video': "Tonton Video", 'proceed_to_question': "Terus ke Soalan"
     }
 }

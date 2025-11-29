@@ -6,11 +6,11 @@
 </style>
 <h2 style="margin-bottom: 20px;">Settings</h2>
 <div class="menu-group">
-    <a href="{{ url_for('set_language', lang_code='en') }}" class="menu-item"><span>🇺🇸 English</span><span>›</span></a>
-    <a href="{{ url_for('set_language', lang_code='bm') }}" class="menu-item"><span>🇲🇾 Bahasa Melayu</span><span>›</span></a>
+    <a href="{{ url_for('main.set_language', lang_code='en') }}" class="menu-item"><span>🇺🇸 English</span><span>›</span></a>
+    <a href="{{ url_for('main.set_language', lang_code='bm') }}" class="menu-item"><span>🇲🇾 Bahasa Melayu</span><span>›</span></a>
 </div>
 <div class="menu-group">
-    <a href="{{ url_for('history') }}" class="menu-item"><span>↺ Learning History</span><span>›</span></a>
+    <a href="{{ url_for('quiz.history') }}" class="menu-item"><span>↺ Learning History</span><span>›</span></a>
 </div>
-<a href="{{ url_for('logout') }}" class="btn" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444;">Log Out</a>
+<a href="{{ url_for('auth.logout') }}" class="btn" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444;">Log Out</a>
 {% endblock %}
