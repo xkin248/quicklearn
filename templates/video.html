@@ -2,14 +2,14 @@
 
 {% block content %}
 <div class="container" style="max-width: 800px;">
-    <div class="card">
+    <div class="card" style="padding: 30px;">
         <a href="{{ url_for('main.dashboard') }}" style="color: var(--text-muted); text-decoration: none; font-size: 14px; display: block; margin-bottom: 15px;">
-            ← {{ t['back_home'] }}
+            &larr; Back to Dashboard
         </a>
 
-        <h2 style="margin-bottom: 20px;">{{ q.subject }}: {{ q.topic_title }}</h2>
+        <h2 style="margin-bottom: 20px; font-weight: 700;">{{ q.subject }}: {{ q.topic_title }}</h2>
         
-        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin-bottom: 25px; background: #000;">
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; margin-bottom: 30px; background: #000; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
             <iframe 
                 src="https://www.youtube.com/embed/{{ q.video_id }}" 
                 style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
@@ -18,9 +18,12 @@
         </div>
 
         <div style="text-align: center;">
-            <p style="margin-bottom: 20px;">Watch the video to understand the topic, then try the quiz!</p>
-            <a href="{{ url_for('quiz.quiz', id=q.id) }}" class="btn-primary" style="padding: 15px 30px; font-size: 18px;">
-                {{ t['proceed_to_question'] }} 👉
+            <p style="margin-bottom: 25px; font-size: 16px; color: var(--text-muted);">
+                Watch the video to understand the topic, then try the quiz!
+            </p>
+            
+            <a href="{{ url_for('quiz.quiz', id=q.start_id) }}" class="btn-primary" style="padding: 18px 32px; font-size: 18px; display: inline-flex; width: auto;">
+                Start Quiz &rarr;
             </a>
         </div>
     </div>

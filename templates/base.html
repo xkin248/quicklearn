@@ -8,190 +8,138 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* --- THEME VARIABLES --- */
+        /* --- MOBILE FIRST VARIABLES --- */
         :root {
             --bg-body: #0f172a;
+            --bg-card: #1e293b;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            
-            /* Vibrant Gradients */
-            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            --gradient-card: linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(30, 41, 59, 0.4) 100%);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
-            
-            /* Colors */
-            --primary: #8b5cf6;
-            --accent: #f43f5e;
-            --success: #10b981;
-            
-            --nav-bg: rgba(15, 23, 42, 0.85);
-            --safe-area-top: env(safe-area-inset-top);
+            --primary: #6366f1;
+            --accent: #0ea5e9;
+            --border: rgba(255, 255, 255, 0.08);
+            --success: #22c55e;
+            --danger: #ef4444;
+            --safe-area-bottom: env(safe-area-inset-bottom, 20px);
         }
 
-        /* Light Mode Override */
-        [data-theme="light"] {
-            --bg-body: #f0f4f8;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%);
-            --glass-border: 1px solid rgba(0, 0, 0, 0.05);
-            --nav-bg: rgba(255, 255, 255, 0.85);
-        }
-
-        /* --- GLOBAL RESET --- */
+        /* Base Reset */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
+            margin: 0;
+            padding: 0;
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-body);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
-            background-attachment: fixed;
             color: var(--text-main);
-            margin: 0;
-            padding-top: calc(70px + var(--safe-area-top)); 
-            padding-bottom: 100px;
-            -webkit-tap-highlight-color: transparent;
+            /* Padding bottom ensures content isn't hidden behind nav bar */
+            padding-bottom: calc(80px + var(--safe-area-bottom)); 
         }
 
-        a { text-decoration: none; color: inherit; }
-        
+        /* Mobile Container */
         .container {
-            padding: 0 20px;
-            max-width: 600px;
+            width: 100%;
+            max-width: 100%;
+            padding: 20px 20px 0 20px; /* Top, Right, 0, Left */
             margin: 0 auto;
         }
 
-        /* --- ANIMATIONS --- */
-        @keyframes floatUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .animate-enter {
-            animation: floatUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-        }
-
-        /* --- MODERN COMPONENTS --- */
-        
-        /* Glass Card */
+        /* Card Style */
         .card {
-            background: var(--gradient-card);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: var(--glass-border);
-            border-radius: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px; /* Rounder corners for mobile */
             padding: 20px;
             margin-bottom: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        /* Gradient Button */
+        /* Buttons (Touch Friendly) */
         .btn-primary {
-            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 16px;
-            border-radius: 18px;
-            font-weight: 700;
+            padding: 16px; /* Larger touch target */
+            border-radius: 16px;
             font-size: 16px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
             transition: transform 0.1s;
         }
-        .btn-primary:active { transform: scale(0.96); }
+        .btn-primary:active { transform: scale(0.98); }
 
-        /* Floating Top Header */
-        .top-header {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 40px);
-            max-width: 560px;
-            height: 60px;
-            background: var(--nav-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: 20px;
-            border: var(--glass-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 1000;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
+        /* Typography */
+        h1 { font-size: 28px; line-height: 1.2; }
+        h2 { font-size: 22px; }
+        p { font-size: 15px; line-height: 1.5; color: var(--text-muted); }
 
-        .app-logo {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Floating Bottom Nav */
+        /* --- BOTTOM NAVIGATION (Android Style) --- */
         .bottom-nav {
             position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 40px);
-            max-width: 560px;
-            background: var(--nav-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: 24px;
-            border: var(--glass-border);
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-around;
-            padding: 12px 0;
+            padding: 12px 10px calc(12px + var(--safe-area-bottom)) 10px;
             z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
         }
 
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 10px;
-            font-weight: 600;
+            text-decoration: none;
             color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 600;
             gap: 4px;
-            transition: 0.2s;
+            width: 60px;
         }
 
-        .nav-item.active { 
-            color: #a855f7; /* Purple Active Color */
-            transform: translateY(-2px);
-        }
+        .nav-icon { font-size: 24px; margin-bottom: 2px; transition: 0.2s; }
         
-        .nav-icon { font-size: 22px; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active .nav-icon { transform: translateY(-2px); }
 
+        /* Animation */
+        .animate-enter { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Input Fields */
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: white;
+            font-size: 16px; /* Prevents iOS/Android zoom */
+            font-family: inherit;
+            outline: none;
+        }
+        input:focus { border-color: var(--primary); background: rgba(255,255,255,0.1); }
     </style>
-
-    <script>
-        // Init Theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-    </script>
 </head>
 <body>
 
     {% if session.get('user_id') %}
-    <header class="top-header animate-enter">
-        <div class="app-logo">⚡ QuickLearn</div>
-        <a href="{{ url_for('auth.logout') }}" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 6px 12px; border-radius: 12px; font-weight: 600; font-size: 12px;">
-            Log Out
+    <div style="padding: 20px 20px 0 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-weight: 800; font-size: 20px; letter-spacing: -0.5px;">⚡ QuickLearn</div>
+        <a href="{{ url_for('main.settings') }}" style="text-decoration: none; font-size: 22px; width: 40px; height: 40px; background: var(--bg-card); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">
+            ⚙️
         </a>
-    </header>
+    </div>
     {% endif %}
 
     <div class="animate-enter">
@@ -202,15 +150,15 @@
     <nav class="bottom-nav">
         <a href="{{ url_for('main.dashboard') }}" class="nav-item {{ 'active' if request.endpoint == 'main.dashboard' }}">
             <span class="nav-icon">🏠</span>
-            <span>{{ t.home }}</span>
+            <span>Home</span>
         </a>
         <a href="{{ url_for('main.subjects_page') }}" class="nav-item {{ 'active' if request.endpoint == 'main.subjects_page' }}">
             <span class="nav-icon">📚</span>
-            <span>{{ t.subjects }}</span>
+            <span>Subjects</span>
         </a>
-        <a href="{{ url_for('main.settings') }}" class="nav-item {{ 'active' if request.endpoint == 'main.settings' }}">
-            <span class="nav-icon">⚙️</span>
-            <span>{{ t.settings }}</span>
+        <a href="{{ url_for('quiz.history') }}" class="nav-item {{ 'active' if request.endpoint == 'quiz.history' }}">
+            <span class="nav-icon">📊</span>
+            <span>History</span>
         </a>
     </nav>
     {% endif %}
