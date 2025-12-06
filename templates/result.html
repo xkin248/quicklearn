@@ -2,39 +2,52 @@
 
 {% block content %}
 <div class="container" style="max-width: 600px; text-align: center;">
-    <div class="card" style="padding: 40px;">
+    
+    <div class="card" style="padding: 40px 20px; border-top: 6px solid {{ 'var(--success)' if is_correct else 'var(--danger)' }};">
         
-        <div style="font-size: 60px; margin-bottom: 20px;">
-            {{ '🎉' if is_correct else '💪' }}
+        <div style="font-size: 80px; margin-bottom: 20px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            {{ '🎉' if is_correct else '🤔' }}
         </div>
 
-        <h1 style="color: {{ 'var(--success)' if is_correct else 'var(--danger)' }}; margin-bottom: 10px;">
+        <h1 style="color: {{ 'var(--success)' if is_correct else 'var(--danger)' }}; margin: 0 0 10px 0; font-size: 32px;">
             {{ t['correct'] if is_correct else t['incorrect'] }}
         </h1>
 
         <p style="font-size: 18px; color: var(--text-muted); margin-bottom: 30px;">
             {% if is_correct %}
-                Great job! You earned XP.
+                You earned <span style="color: var(--accent); font-weight: bold;">+10 XP</span>! Keep it up!
             {% else %}
-                Don't worry, keep practicing!
+                Don't worry, learning takes time. Try again!
             {% endif %}
         </p>
 
-        <div style="background: rgba(99,102,241,0.1); padding: 20px; border-radius: 12px; text-align: left; margin-bottom: 30px;">
-            <div style="font-weight: bold; color: var(--primary); margin-bottom: 5px;">{{ t['explanation'] }}:</div>
-            <div style="color: var(--text-main);">{{ explanation }}</div>
+        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 20px; border-radius: 16px; text-align: left; margin-bottom: 30px;">
+            <div style="font-weight: 700; color: var(--primary); margin-bottom: 8px; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">
+                {{ t['explanation'] }}
+            </div>
+            <div style="color: var(--text-main); line-height: 1.6;">
+                {{ explanation }}
+            </div>
         </div>
 
-        <div style="display: flex; gap: 10px; justify-content: center;">
-            <a href="{{ url_for('main.dashboard') }}" class="btn-secondary">{{ t['home'] }}</a>
+        <div style="display: flex; gap: 12px; flex-direction: column;">
+            <a href="{{ url_for('quiz.next_question') }}" class="btn-primary" style="padding: 18px;">
+                <span>{{ t['next'] }} Question</span>
+                <span>→</span>
+            </a>
             
-            {% if not is_correct %}
-                <a href="{{ url_for('quiz.quiz', id=question_id) }}" class="btn-primary">Try Again</a>
-            {% else %}
-                <a href="{{ url_for('quiz.start_random') }}" class="btn-primary">{{ t['next'] }} ➡️</a>
-            {% endif %}
+            <a href="{{ url_for('main.dashboard') }}" style="padding: 16px; border-radius: 16px; color: var(--text-muted); font-weight: 600; background: var(--bg-input);">
+                {{ t['home'] }}
+            </a>
         </div>
-
     </div>
+
 </div>
+
+<style>
+    @keyframes popIn {
+        0% { transform: scale(0); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+</style>
 {% endblock %}

@@ -1,86 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuickLearn AI</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <title>QuickLearn</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --bg-body: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            
+            /* Vibrant Gradients */
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --gradient-card: linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(30, 41, 59, 0.4) 100%);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+            
+            /* Colors */
+            --primary: #8b5cf6;
+            --accent: #f43f5e;
+            --success: #10b981;
+            
+            --nav-bg: rgba(15, 23, 42, 0.85);
+            --safe-area-top: env(safe-area-inset-top);
+        }
+
+        /* Light Mode Override */
+        [data-theme="light"] {
+            --bg-body: #f0f4f8;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%);
+            --glass-border: 1px solid rgba(0, 0, 0, 0.05);
+            --nav-bg: rgba(255, 255, 255, 0.85);
+        }
+
+        /* --- GLOBAL RESET --- */
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-body);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            margin: 0;
+            padding-top: calc(70px + var(--safe-area-top)); 
+            padding-bottom: 100px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        
+        .container {
+            padding: 0 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes floatUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-enter {
+            animation: floatUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        /* --- MODERN COMPONENTS --- */
+        
+        /* Glass Card */
+        .card {
+            background: var(--gradient-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: var(--glass-border);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Gradient Button */
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 18px;
+            font-weight: 700;
+            font-size: 16px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            transition: transform 0.1s;
+        }
+        .btn-primary:active { transform: scale(0.96); }
+
+        /* Floating Top Header */
+        .top-header {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 560px;
+            height: 60px;
+            background: var(--nav-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 20px;
+            border: var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .app-logo {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Floating Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 560px;
+            background: var(--nav-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px;
+            border: var(--glass-border);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            gap: 4px;
+            transition: 0.2s;
+        }
+
+        .nav-item.active { 
+            color: #a855f7; /* Purple Active Color */
+            transform: translateY(-2px);
+        }
+        
+        .nav-icon { font-size: 22px; }
+
+    </style>
+
+    <script>
+        // Init Theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
 </head>
-
 <body>
+
     {% if session.get('user_id') %}
-    <div class="header">
-        <a href="{{ url_for('main.dashboard') }}" class="logo">QuickLearn 🚀</a>
-        <div>
-            <a href="{{ url_for('main.set_language', lang_code='en') }}"
-                style="color:white; margin-right:10px; text-decoration:none;">EN</a>
-            <a href="{{ url_for('main.set_language', lang_code='bm') }}"
-                style="color:white; margin-right:10px; text-decoration:none;">BM</a>
-            <a href="{{ url_for('auth.logout') }}" class="logout-btn">{{ t['logout'] }}</a>
-        </div>
-    </div>
+    <header class="top-header animate-enter">
+        <div class="app-logo">⚡ QuickLearn</div>
+        <a href="{{ url_for('auth.logout') }}" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 6px 12px; border-radius: 12px; font-weight: 600; font-size: 12px;">
+            Log Out
+        </a>
+    </header>
     {% endif %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    {% for category, message in messages %}
-    <div
-        style="text-align:center; padding: 15px; background: rgba(99, 102, 241, 0.2); color: white; border-bottom: 1px solid rgba(255,255,255,0.1);">
-        {{ message }}
+    <div class="animate-enter">
+        {% block content %}{% endblock %}
     </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
 
-    {% block content %}{% endblock %}
-
-    <!-- Bottom Navigation -->
     {% if session.get('user_id') %}
     <nav class="bottom-nav">
-        <a href="{{ url_for('main.dashboard') }}" class="nav-item">
+        <a href="{{ url_for('main.dashboard') }}" class="nav-item {{ 'active' if request.endpoint == 'main.dashboard' }}">
             <span class="nav-icon">🏠</span>
-            <span class="nav-label">Home</span>
+            <span>{{ t.home }}</span>
         </a>
-        <a href="{{ url_for('main.subjects_page') }}" class="nav-item">
+        <a href="{{ url_for('main.subjects_page') }}" class="nav-item {{ 'active' if request.endpoint == 'main.subjects_page' }}">
             <span class="nav-icon">📚</span>
-            <span class="nav-label">Subjects</span>
+            <span>{{ t.subjects }}</span>
         </a>
-        <a href="{{ url_for('main.index') }}" class="nav-item nav-item-center">
-            <span class="nav-icon-center">▶️</span>
-        </a>
-        <a href="{{ url_for('quiz.history') }}" class="nav-item">
-            <span class="nav-icon">📊</span>
-            <span class="nav-label">History</span>
-        </a>
-        <a href="{{ url_for('main.settings') }}" class="nav-item">
+        <a href="{{ url_for('main.settings') }}" class="nav-item {{ 'active' if request.endpoint == 'main.settings' }}">
             <span class="nav-icon">⚙️</span>
-            <span class="nav-label">Settings</span>
+            <span>{{ t.settings }}</span>
         </a>
     </nav>
     {% endif %}
 
-    <!-- Theme Toggle Button -->
-    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-        <span id="theme-icon">🌙</span>
-    </button>
-
-    <script>
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme') || 'dark';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            document.getElementById('theme-icon').textContent = newTheme === 'dark' ? '🌙' : '☀️';
-        }
-        (function () {
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            document.getElementById('theme-icon').textContent = savedTheme === 'dark' ? '🌙' : '☀️';
-        })();
-    </script>
 </body>
-
 </html>

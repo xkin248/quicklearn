@@ -1,16 +1,54 @@
 {% extends "base.html" %}
 {% block content %}
 <style>
-    .menu-item { display: flex; justify-content: space-between; padding: 16px; background: #1e293b; border-bottom: 1px solid #334155; text-decoration: none; color: white; }
-    .menu-group { border-radius: 16px; overflow: hidden; margin-bottom: 20px; border: 1px solid #334155; }
+    .menu-item { display: flex; justify-content: space-between; padding: 16px; background: var(--bg-card); border-bottom: 1px solid var(--border); text-decoration: none; color: var(--text-main); }
+    .menu-group { border-radius: 16px; overflow: hidden; margin-bottom: 24px; border: 1px solid var(--border); }
+    .section-title { font-size: 14px; color: var(--text-muted); margin: 0 0 8px 8px; text-transform: uppercase; }
+    .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--primary); }
+    input:checked + .slider:before { transform: translateX(22px); }
 </style>
-<h2 style="margin-bottom: 20px;">Settings</h2>
-<div class="menu-group">
-    <a href="{{ url_for('main.set_language', lang_code='en') }}" class="menu-item"><span>🇺🇸 English</span><span>›</span></a>
-    <a href="{{ url_for('main.set_language', lang_code='bm') }}" class="menu-item"><span>🇲🇾 Bahasa Melayu</span><span>›</span></a>
+
+<div class="container">
+    <h1 style="margin-bottom: 24px;">{{ t.settings }}</h1>
+
+    <div class="section-title">{{ t.language }}</div>
+    <div class="menu-group">
+        <a href="{{ url_for('main.set_language', lang_code='en') }}" class="menu-item"><span>🇺🇸 English</span><span>{% if session.get('lang') == 'en' %}✓{% endif %}</span></a>
+        <a href="{{ url_for('main.set_language', lang_code='bm') }}" class="menu-item"><span>🇲🇾 Bahasa Melayu</span><span>{% if session.get('lang') == 'bm' %}✓{% endif %}</span></a>
+    </div>
+
+    <div class="section-title">{{ t.appearance }}</div>
+    <div class="menu-group">
+        <div class="menu-item">
+            <span>{{ t.dark_mode }}</span>
+            <label class="switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="section-title">{{ t.history }}</div>
+    <div class="menu-group">
+        <a href="{{ url_for('quiz.history') }}" class="menu-item"><span>↺ {{ t.history }}</span><span>›</span></a>
+    </div>
+
+    <a href="{{ url_for('auth.logout') }}" class="btn-primary" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; margin-top: 20px;">{{ t.logout }}</a>
 </div>
-<div class="menu-group">
-    <a href="{{ url_for('quiz.history') }}" class="menu-item"><span>↺ Learning History</span><span>›</span></a>
-</div>
-<a href="{{ url_for('auth.logout') }}" class="btn" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444;">Log Out</a>
+
+<script>
+    const toggle = document.getElementById('theme-toggle');
+    const currentTheme = localStorage.getItem('theme');
+    toggle.checked = (currentTheme !== 'light'); // Checked = Dark Mode
+
+    toggle.addEventListener('change', function() {
+        const theme = this.checked ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    });
+</script>
 {% endblock %}

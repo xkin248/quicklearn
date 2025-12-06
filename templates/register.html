@@ -1,35 +1,66 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <div style="text-align: center; margin-bottom: 32px;">
-            <div style="font-size: 40px; margin-bottom: 16px;">🚀</div>
-            <h2 style="margin: 0; font-size: 24px; color: white;">Create Account</h2>
-            <p style="margin: 8px 0 0 0; color: var(--text-muted); font-size: 14px;">Start your learning journey</p>
+<div class="container" style="min-height: 85vh; display: flex; flex-direction: column; justify-content: center;">
+    
+    <div class="card animate-enter" style="padding: 40px 25px; text-align: center;">
+        
+        <div style="font-size: 60px; margin-bottom: 15px; animation: blast 2s infinite;">
+            🚀
         </div>
 
+        <h1 style="margin: 0 0 8px 0; font-size: 28px; font-weight: 800; color: var(--text-main);">Join QuickLearn</h1>
+        <p style="color: var(--text-muted); margin: 0 0 30px 0;">Start your learning adventure today!</p>
+
         {% if error %}
-        <div
-            style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+        <div style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 13px; font-weight: 600; border: 1px solid rgba(239, 68, 68, 0.4);">
             {{ error }}
         </div>
         {% endif %}
 
         <form method="POST">
-            <label>Username</label>
-            <input type="text" name="username" required>
+            <div style="text-align: left; margin-bottom: 16px;">
+                <label style="font-size: 12px; font-weight: 800; color: var(--text-main); margin-left: 4px; display: block; margin-bottom: 8px; letter-spacing: 1px; opacity: 0.9;">CHOOSE USERNAME</label>
+                <input type="text" name="username" placeholder="e.g. awesome_student" required 
+                       style="background: rgba(255, 255, 255, 0.1); border: 1px solid var(--glass-border); color: var(--text-main); font-weight: 600;">
+            </div>
 
-            <label>Password</label>
-            <input type="password" name="password" required>
+            <div style="text-align: left; margin-bottom: 30px;">
+                <label style="font-size: 12px; font-weight: 800; color: var(--text-main); margin-left: 4px; display: block; margin-bottom: 8px; letter-spacing: 1px; opacity: 0.9;">CHOOSE PASSWORD</label>
+                <input type="password" name="password" placeholder="••••••••" required 
+                       style="background: rgba(255, 255, 255, 0.1); border: 1px solid var(--glass-border); color: var(--text-main); font-weight: 600;">
+            </div>
 
-            <button type="submit" class="btn-primary">Create Account</button>
+            <button type="submit" class="btn-primary" style="padding: 18px; font-size: 16px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); color: white;">
+                Create Account
+            </button>
         </form>
 
-        <div class="auth-switch">
-            Already have an account?
-            <a href="{{ url_for('auth.login') }}">Login here</a>
-        </div>
-
     </div>
+
+    <div class="animate-enter" style="text-align: center; margin-top: 20px; animation-delay: 0.1s;">
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 8px;">Already have an account?</p>
+        <a href="{{ url_for('auth.login') }}" style="color: #10b981; font-weight: 800; text-decoration: none; font-size: 15px;">
+            Log In Here →
+        </a>
+    </div>
+
 </div>
+
+<style>
+    @keyframes blast {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+
+    input:focus {
+        border-color: #10b981 !important;
+        background: rgba(255, 255, 255, 0.15) !important;
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+    }
+    
+    ::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+</style>
 {% endblock %}

@@ -1,169 +1,185 @@
-from flask import Blueprint, render_template, redirect, url_for, session, request, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+import psycopg2
+import psycopg2.extras
 import random
-from datetime import datetime, timezone
-from models import db, User, Question, Attempt, SubjectProgress, UserMission, Mission
-from helpers import subjects
 
 quiz_bp = Blueprint('quiz', __name__)
+
+DATABASE_URL = 'postgresql://neondb_owner:npg_zsbQNiH92vkl@ep-floral-hill-a1sq9ye6-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&connect_timeout=30'
+
+def get_db_connection():
+    return psycopg2.connect(DATABASE_URL)
+
+# ==========================================
+#  DATA CONFIGURATION
+# ==========================================
+subject_videos = {
+    "Mathematics": {"topic_title": "Algebra", "video_id": "dN3sPEtTZPE", "start_id": 101},
+    "Science": {"topic_title": "States of Matter", "video_id": "wclY8F-UoTE", "start_id": 201},
+    "History": {"topic_title": "Malacca Sultanate", "video_id": "L0EiJZRxQUY", "start_id": 301},
+    "English": {"topic_title": "Past Tense", "video_id": "K8kqQDyZ1ik", "start_id": 401}
+}
+
+# FULL QUESTION LIST
+questions_db = [
+    # MATH
+    {"id": 101, "subject": "Mathematics", "difficulty": "Easy", "question_text": "In 5x, what is '5'?", "option_a": "Variable", "option_b": "Coefficient", "option_c": "Constant", "option_d": "Power", "correct_answer": "Coefficient", "explanation": "It is the coefficient."},
+    {"id": 102, "subject": "Mathematics", "difficulty": "Easy", "question_text": "Simplify 2x + 3x", "option_a": "5x", "option_b": "6x", "option_c": "5x^2", "option_d": "x", "correct_answer": "5x", "explanation": "Add coefficients: 2+3=5."},
+    
+    # SCIENCE
+    # SCIENCE (States of Matter)
+    {
+        "id": 201, "subject": "Science", "difficulty": "Easy",
+        "question_text": "Which state of matter has a definite shape and volume?",
+        "option_a": "Liquid", "option_b": "Solid", "option_c": "Gas", "option_d": "Plasma",
+        "correct_answer": "Solid",
+        "explanation": "Solids keep their shape and volume because their particles are packed tightly together and vibrate in place."
+    },
+    {
+        "id": 202, "subject": "Science", "difficulty": "Medium",
+        "question_text": "How do particles in a GAS behave?",
+        "option_a": "They are packed tightly in a pattern", 
+        "option_b": "They slide past each other slowly", 
+        "option_c": "They move freely at high speeds", 
+        "option_d": "They do not move at all",
+        "correct_answer": "They move freely at high speeds",
+        "explanation": "Gas particles have a lot of energy and are spread far apart, moving quickly in all directions."
+    },
+    {
+        "id": 203, "subject": "Science", "difficulty": "Medium",
+        "question_text": "What happens when a liquid turns into a solid?",
+        "option_a": "Melting", "option_b": "Evaporation", "option_c": "Condensation", "option_d": "Freezing",
+        "correct_answer": "Freezing",
+        "explanation": "Freezing occurs when a liquid loses heat energy, causing its particles to slow down and lock into a solid structure."
+    },
+    {
+        "id": 204, "subject": "Science", "difficulty": "Hard",
+        "question_text": "Why can liquids flow and take the shape of their container?",
+        "option_a": "The particles are far apart",
+        "option_b": "The particles can slide past one another",
+        "option_c": "The particles are locked in place",
+        "option_d": "Liquids have no mass",
+        "correct_answer": "The particles can slide past one another",
+        "explanation": "In a liquid, particles are close together but not held in a fixed position, allowing them to flow."
+    },
+
+    # HISTORY
+    {"id": 301, "subject": "History", "difficulty": "Easy", "question_text": "Founder of Melaka?", "option_a": "Ali", "option_b": "Parameswara", "option_c": "Abu", "option_d": "Lee", "correct_answer": "Parameswara", "explanation": "Parameswara founded it."},
+    
+    # ENGLISH
+    {"id": 401, "subject": "English", "difficulty": "Easy", "question_text": "Past tense of go?", "option_a": "Went", "option_b": "Goes", "option_c": "Gone", "option_d": "Going", "correct_answer": "Went", "explanation": "Go -> Went."}
+]
+
+# ==========================================
+#  ROUTES
+# ==========================================
 
 @quiz_bp.route('/start_subject/<subject_name>')
 def start_subject(subject_name):
     if 'user_id' not in session: return redirect(url_for('auth.login'))
     
-    user = db.session.get(User, session['user_id'])
-    lang = user.language if user else 'en'
-
-    # Fetch questions for the subject
-    questions = Question.query.filter_by(subject=subject_name, language=lang).all()
-    # Fallback to English if no questions in user's language
-    if not questions and lang != 'en':
-        questions = Question.query.filter_by(subject=subject_name, language='en').all()
-
-    if not questions: 
-        flash("No questions available for this subject yet!", "info")
-        return redirect(url_for('main.dashboard'))
+    # 1. SAVE THE CURRENT SUBJECT TO SESSION
+    session['current_subject'] = subject_name
     
-    # Pick a random question
-    next_q = random.choice(questions)
+    data = subject_videos.get(subject_name)
+    if not data: return redirect(url_for('main.dashboard'))
     
-    session['attempts'] = 0
-    session['current_q_id'] = next_q.id
-    
-    # Redirect to Video or Quiz
-    if next_q.video_id:
-        return redirect(url_for('quiz.video_page', id=next_q.id))
-    else:
-        return redirect(url_for('quiz.quiz', id=next_q.id))
+    # Pass data to video template
+    return render_template('video.html', q={
+        "subject": subject_name, 
+        "topic_title": data['topic_title'], 
+        "video_id": data['video_id'], 
+        "id": data['start_id']
+    })
 
-@quiz_bp.route('/start_random')
-def start_random():
-    if 'user_id' not in session: return redirect(url_for('auth.login'))
-    chosen_subject = random.choice(subjects)
-    return redirect(url_for('quiz.start_subject', subject_name=chosen_subject))
-
-@quiz_bp.route('/video/<int:id>')
-def video_page(id):
-    if 'user_id' not in session: return redirect(url_for('auth.login'))
-    q = db.session.get(Question, id)
-    if not q: return redirect(url_for('main.dashboard'))
-    return render_template('video.html', q=q)
-
-@quiz_bp.route('/quiz/<int:id>')
+@quiz_bp.route('/question/<int:id>')
 def quiz(id):
     if 'user_id' not in session: return redirect(url_for('auth.login'))
-    q = db.session.get(Question, id)
-    if not q: return redirect(url_for('main.dashboard'))
 
-    current_attempts = session.get('attempts', 0)
-    if str(session.get('current_q_id')) != str(id):
-        session['current_q_id'] = id
-        session['attempts'] = 0
-        current_attempts = 0
+    question = next((q for q in questions_db if q['id'] == id), None)
+    if not question: return "Question not found", 404
+    
+    # Ensure subject is updated in session just in case they jumped here directly
+    session['current_subject'] = question['subject']
+    
+    attempts = session.get('attempts', 0)
+    return render_template('quiz.html', q=question, attempts=attempts)
 
-    return render_template('quiz.html', q=q, attempts=current_attempts)
-
-@quiz_bp.route('/submit_quiz', methods=['POST'])
+@quiz_bp.route('/submit', methods=['POST'])
 def submit_quiz():
     if 'user_id' not in session: return redirect(url_for('auth.login'))
-    
-    user = db.session.get(User, session['user_id'])
-    question_id = request.form.get('question_id')
-    q = db.session.get(Question, int(question_id))
-    
-    if not q: return redirect(url_for('main.dashboard'))
 
-    is_correct = (request.form.get('option') == q.correct_answer)
+    q_id = int(request.form.get('question_id'))
+    option = request.form.get('option')
     
-    if is_correct:
-        # CORRECT ANSWER
-        session['attempts'] = 0
-        user.streak = (user.streak or 0) + 1
-        db.session.add(Attempt(user_id=user.id, question_id=q.id, is_correct=True))
-        
-        xp_award = {'easy': 10, 'medium': 20, 'hard': 30}.get(q.difficulty, 20)
-        user.xp += xp_award
-        
-        # Update Subject Progress
-        subject_prog = SubjectProgress.query.filter_by(user_id=user.id, subject=q.subject).first()
-        if not subject_prog:
-            subject_prog = SubjectProgress(
-                user_id=user.id, subject=q.subject, 
-                total_questions=0, correct_answers=0, mastery_level=1
-            )
-            db.session.add(subject_prog)
-        
-        # Safety Check for NULLs
-        if subject_prog.total_questions is None: subject_prog.total_questions = 0
-        if subject_prog.correct_answers is None: subject_prog.correct_answers = 0
-        
-        subject_prog.total_questions += 1
-        subject_prog.correct_answers += 1
-        subject_prog.update_mastery()
-        
-        # Mission Logic
-        today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
-        daily_mission = Mission.query.filter_by(mission_type='daily_questions', is_daily=True).first()
-        
-        if daily_mission:
-            user_mission = UserMission.query.filter(
-                UserMission.user_id == user.id,
-                UserMission.mission_id == daily_mission.id,
-                UserMission.created_at >= today_start
-            ).first()
-            
-            if not user_mission:
-                user_mission = UserMission(user_id=user.id, mission_id=daily_mission.id)
-                db.session.add(user_mission)
-            
-            if user_mission.progress is None: user_mission.progress = 0
-
-            if not user_mission.completed:
-                user_mission.progress += 1
-                if user_mission.progress >= daily_mission.target_value:
-                    user_mission.completed = True
-                    user_mission.completed_at = datetime.now(timezone.utc)
-                    user.xp += daily_mission.xp_reward
-                    flash(f"Mission Complete! +{daily_mission.xp_reward} XP", "success")
-        
-        db.session.commit()
-        return render_template('result.html', is_correct=True, explanation=q.explanation, answer=q.correct_answer, question_id=q.id, q=q)
+    question = next((q for q in questions_db if q['id'] == q_id), None)
+    if not question: return redirect(url_for('main.dashboard'))
     
-    else:
-        # INCORRECT ANSWER
-        current_attempts = session.get('attempts', 0) + 1
-        session['attempts'] = current_attempts
+    is_correct = (option == question['correct_answer'])
+    xp_gain = 10 if is_correct else 0
+    
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
         
-        if current_attempts < 3:
-            flash(f"Incorrect! {3 - current_attempts} attempts left.", "warning")
-            return redirect(url_for('quiz.quiz', id=q.id))
-        else:
-            session['attempts'] = 0
-            user.streak = 0
-            db.session.add(Attempt(user_id=user.id, question_id=q.id, is_correct=False))
-            
-            subject_prog = SubjectProgress.query.filter_by(user_id=user.id, subject=q.subject).first()
-            if not subject_prog:
-                subject_prog = SubjectProgress(
-                    user_id=user.id, subject=q.subject, 
-                    total_questions=0, correct_answers=0, mastery_level=1
-                )
-                db.session.add(subject_prog)
+        # Save History
+        cur.execute("INSERT INTO history (user_id, subject, score) VALUES (%s, %s, %s)", 
+                   (session['user_id'], question['subject'], xp_gain))
+        
+        if is_correct:
+            # Update User Stats
+            cur.execute("UPDATE users SET xp = xp + %s, streak = streak + 1 WHERE id = %s", (xp_gain, session['user_id']))
+            # Update Progress
+            cur.execute("SELECT id FROM progress WHERE user_id = %s AND subject = %s", (session['user_id'], question['subject']))
+            if cur.fetchone():
+                cur.execute("UPDATE progress SET total_answered = total_answered + 1 WHERE user_id = %s AND subject = %s", (session['user_id'], question['subject']))
+            else:
+                cur.execute("INSERT INTO progress (user_id, subject, mastery_level, total_answered) VALUES (%s, %s, 1, 1)", (session['user_id'], question['subject']))
+        
+        conn.commit()
+    except Exception as e:
+        print(f"Submit Error: {e}")
+    finally:
+        if conn: conn.close()
+    
+    return render_template('result.html', is_correct=is_correct, explanation=question['explanation'])
 
-            if subject_prog.total_questions is None: subject_prog.total_questions = 0
-            
-            subject_prog.total_questions += 1
-            subject_prog.update_mastery()
-            
-            db.session.commit()
-            return render_template('result.html', is_correct=False, explanation=q.explanation, answer=q.correct_answer, question_id=q.id, q=q)
+@quiz_bp.route('/next_question')
+def next_question():
+    """
+    Finds a random question from the CURRENT subject only.
+    """
+    if 'user_id' not in session: return redirect(url_for('auth.login'))
+    
+    # 1. Get the current subject from session
+    current_subject = session.get('current_subject')
+    
+    # If no subject is set (e.g. session expired), go back to dashboard
+    if not current_subject:
+        return redirect(url_for('main.dashboard'))
+
+    # 2. Filter questions list to ONLY show this subject
+    subject_questions = [q for q in questions_db if q['subject'] == current_subject]
+    
+    # If no questions found for this subject
+    if not subject_questions:
+        return redirect(url_for('main.dashboard'))
+
+    # 3. Pick a random question from the filtered list
+    next_q = random.choice(subject_questions)
+    
+    return redirect(url_for('quiz.quiz', id=next_q['id']))
 
 @quiz_bp.route('/history')
 def history():
     if 'user_id' not in session: return redirect(url_for('auth.login'))
-    my_attempts = Attempt.query.filter_by(user_id=session['user_id']).order_by(Attempt.timestamp.desc()).limit(50).all()
-    history_data = []
-    for attempt in my_attempts:
-        q = db.session.get(Question, attempt.question_id)
-        if q:
-            history_data.append({'subject': q.subject, 'question': q.question_text, 'is_correct': attempt.is_correct})
-    return render_template('history.html', history=history_data)
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cur.execute("SELECT subject, score, date FROM history WHERE user_id = %s ORDER BY date DESC LIMIT 50", (session['user_id'],))
+        history_data = cur.fetchall()
+        return render_template('history.html', history=history_data)
+    finally:
+        if conn: conn.close()

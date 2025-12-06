@@ -1,39 +1,71 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container" style="max-width: 800px;">
-    <div class="card">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-            <span style="color: var(--accent); font-weight: bold;">{{ q.subject }}</span>
-            <span style="color: var(--text-muted);">Difficulty: {{ q.difficulty }}</span>
-        </div>
-
-        <h2 style="font-size: 24px; margin-bottom: 30px;">{{ q.question_text }}</h2>
-
-        <form action="{{ url_for('quiz.submit_quiz') }}" method="POST">
-            <input type="hidden" name="question_id" value="{{ q.id }}">
-
-            <label class="option-label">
-                <input type="radio" name="option" value="{{ q.option_a }}" required> {{ q.option_a }}
-            </label>
-            <label class="option-label">
-                <input type="radio" name="option" value="{{ q.option_b }}" required> {{ q.option_b }}
-            </label>
-            <label class="option-label">
-                <input type="radio" name="option" value="{{ q.option_c }}" required> {{ q.option_c }}
-            </label>
-            <label class="option-label">
-                <input type="radio" name="option" value="{{ q.option_d }}" required> {{ q.option_d }}
-            </label>
-
-            <button type="submit" class="btn-primary" style="margin-top: 20px;">{{ t['submit'] }}</button>
-        </form>
-
-        {% if attempts > 0 %}
-        <div style="margin-top: 15px; color: var(--danger); text-align: center;">
-            ⚠️ {{ attempts }} {{ t['attempts_left'] }}
-        </div>
-        {% endif %}
+<div class="container" style="max-width: 500px;">
+    
+    <div style="display: flex; justify-content: center; margin-bottom: 24px;">
+        <span style="background: rgba(255,255,255,0.05); padding: 6px 16px; border-radius: 20px; font-size: 12px; color: var(--text-muted); border: 1px solid var(--border);">
+            {{ q.subject }} • {{ q.difficulty }}
+        </span>
     </div>
+
+    <div class="card" style="text-align: center; padding: 30px 20px; border-bottom: 4px solid var(--border);">
+        <h2 style="font-size: 20px; line-height: 1.5; margin: 0; font-weight: 600;">{{ q.question_text }}</h2>
+    </div>
+
+    <form action="{{ url_for('quiz.submit_quiz') }}" method="POST">
+        <input type="hidden" name="question_id" value="{{ q.id }}">
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            {% for opt, val in [('A', q.option_a), ('B', q.option_b), ('C', q.option_c), ('D', q.option_d)] %}
+            <label class="option-card">
+                <input type="radio" name="option" value="{{ val }}" required>
+                <div class="option-content">
+                    <div class="option-letter">{{ opt }}</div>
+                    <div style="font-weight: 500;">{{ val }}</div>
+                </div>
+            </label>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top: 32px;">
+            {{ t.submit }}
+        </button>
+    </form>
 </div>
+
+<style>
+    .option-card { display: block; position: relative; cursor: pointer; }
+    .option-card input { position: absolute; opacity: 0; }
+    
+    .option-content {
+        background: var(--bg-card);
+        border: 2px solid var(--border);
+        border-radius: 18px;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: 0.2s;
+    }
+
+    .option-letter {
+        width: 36px; height: 36px;
+        background: var(--bg-body);
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; color: var(--text-muted);
+    }
+
+    /* Checked State */
+    .option-card input:checked + .option-content {
+        border-color: var(--primary);
+        background: rgba(139, 92, 246, 0.15);
+        transform: scale(1.02);
+    }
+    .option-card input:checked + .option-content .option-letter {
+        background: var(--primary);
+        color: white;
+    }
+</style>
 {% endblock %}
