@@ -1,16 +1,11 @@
 from flask import Blueprint, render_template, session, redirect, url_for
 import psycopg2
 import psycopg2.extras
-# IMPORT TRANSLATIONS FROM HELPERS.PY
 from helpers import translations 
+# Import DB connection from app.py
+from database import get_db_connection, return_db_connection
 
 main_bp = Blueprint('main', __name__)
-
-# Database URL (Matches app.py)
-DATABASE_URL = 'postgresql://neondb_owner:npg_zsbQNiH92vkl@ep-floral-hill-a1sq9ye6-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&connect_timeout=30'
-
-def get_db_connection():
-    return psycopg2.connect(DATABASE_URL)
 
 @main_bp.route('/')
 def index():
@@ -36,7 +31,7 @@ def dashboard():
             return redirect(url_for('auth.login'))
         user = dict(row)
 
-        # 2. Level & XP Logic
+        # 2. XP & Level Logic
         current_xp = user['xp']
         level = (current_xp // 100) + 1      
         xp_progress = current_xp % 100       
@@ -47,18 +42,31 @@ def dashboard():
         progress_rows = cur.fetchall()
         user_progress = {row['subject']: row['mastery_level'] for row in progress_rows}
 
-        # 4. Get Daily Missions
+        # --- NEW FIX: ASSIGN MISSIONS IF MISSING ---
+        # This SQL inserts missions into user_missions ONLY if they don't exist yet
         cur.execute("""
-            SELECT m.*, 
-            CASE WHEN um.user_id IS NOT NULL THEN TRUE ELSE FALSE END as completed
+            INSERT INTO user_missions (user_id, mission_id, progress, completed, date_assigned)
+            SELECT %s, id, 0, FALSE, CURRENT_DATE
+            FROM missions
+            WHERE id NOT IN (
+                SELECT mission_id FROM user_missions 
+                WHERE user_id = %s
+            );
+        """, (session['user_id'], session['user_id']))
+        conn.commit()
+        # -------------------------------------------
+
+        # 4. Fetch User Missions for Display
+        cur.execute("""
+            SELECT m.title, m.description, m.xp_reward, m.target, 
+                   um.progress, um.completed 
             FROM missions m
-            LEFT JOIN user_missions um ON m.id = um.mission_id AND um.user_id = %s
-            WHERE m.is_daily = TRUE
+            JOIN user_missions um ON m.id = um.mission_id
+            WHERE um.user_id = %s
+            ORDER BY um.completed ASC, m.id ASC
         """, (session['user_id'],))
         missions_data = cur.fetchall()
 
-        # 5. Render Template
-        # We use translations.get() to safely load the language (defaults to English)
         return render_template('dashboard.html', 
                              user=user, 
                              t=translations.get(session.get('lang', 'en'), translations['en']), 
@@ -70,9 +78,9 @@ def dashboard():
 
     except Exception as e:
         print(f"Dashboard Error: {e}")
-        return "Database Error (Check terminal for details)", 500
+        return "Database Error", 500
     finally:
-        if conn: conn.close()
+        if conn: return_db_connection(conn)
 
 @main_bp.route('/subjects')
 def subjects_page():
@@ -83,7 +91,6 @@ def subjects_page():
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         
-        # Get progress to show mastery levels on cards
         cur.execute("SELECT * FROM subject_progress WHERE user_id = %s", (session['user_id'],))
         progress_rows = cur.fetchall()
         user_progress = {row['subject']: row['mastery_level'] for row in progress_rows}
@@ -94,7 +101,7 @@ def subjects_page():
                                progress=user_progress,
                                t=translations.get(session.get('lang', 'en'), translations['en']))
     finally:
-        if conn: conn.close()
+        if conn: return_db_connection(conn)
 
 @main_bp.route('/settings')
 def settings():

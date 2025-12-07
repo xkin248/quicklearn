@@ -6,14 +6,12 @@
     <div style="text-align: center; margin-bottom: 40px;">
         <div style="font-size: 70px; margin-bottom: 10px;">👋</div>
         <h1 style="margin: 0; font-weight: 800;">Welcome Back</h1>
-        <p>Login to continue learning</p>
+        <p style="color: var(--text-muted);">Login to continue learning</p>
     </div>
 
     <div class="card" style="padding: 30px 20px;">
         {% if error %}
-        <div style="background: rgba(239, 68, 68, 0.15); color: #fca5a5; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; text-align: center;">
-            {{ error }}
-        </div>
+        <div style="background: rgba(239, 68, 68, 0.15); color: var(--danger); padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; text-align: center;">{{ error }}</div>
         {% endif %}
 
         <form method="POST">
@@ -27,17 +25,12 @@
                 <input type="password" name="password" placeholder="••••••••" required>
             </div>
 
-            <button type="submit" class="btn-primary">
-                Log In
-            </button>
+            <button type="submit" class="btn-primary">Log In</button>
         </form>
     </div>
 
     <div style="text-align: center; margin-top: 20px;">
-        <p style="font-size: 14px;">Don't have an account? 
-            <a href="{{ url_for('auth.register') }}" style="color: var(--primary); font-weight: 700; text-decoration: none;">Register</a>
-        </p>
+        <p style="font-size: 14px; color: var(--text-muted);">Don't have an account? <a href="{{ url_for('auth.register') }}" style="color: var(--primary); font-weight: 700; text-decoration: none;">Register</a></p>
     </div>
-
 </div>
 {% endblock %}

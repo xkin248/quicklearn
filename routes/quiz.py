@@ -1,17 +1,13 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
-import psycopg2
+from flask import Blueprint, render_template, request, redirect, url_for, session
 import psycopg2.extras
 import random
-import os
-# IMPORT TRANSLATIONS
-from helpers import translations
+from helpers import translations 
+
+# --- IMPORTANT: Import Database Functions ---
+# We import these from database.py so we don't need DATABASE_URL here
+from database import get_db_connection, return_db_connection
 
 quiz_bp = Blueprint('quiz', __name__)
-
-DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://neondb_owner:npg_zsbQNiH92vkl@ep-floral-hill-a1sq9ye6-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&connect_timeout=30')
-
-def get_db_connection():
-    return psycopg2.connect(DATABASE_URL)
 
 # ==========================================
 #  VIDEO & TOPIC CONFIGURATION
@@ -106,14 +102,13 @@ questions_db = [
 def start_subject(subject_name):
     if 'user_id' not in session: return redirect(url_for('auth.login'))
     
-    # Check if subject exists
+    # 2. FIX: LOAD ACTUAL VIDEO DATA FROM DICTIONARY (Fixed UndefinedError)
     if subject_name not in subject_videos:
         return redirect(url_for('main.subjects_page'))
     
     session['current_subject'] = subject_name
     video_data = subject_videos[subject_name]
     
-    # Show the video lecture page first
     return render_template('video.html', 
                            q={"subject": subject_name, **video_data}, 
                            t=translations.get(session.get('lang', 'en'), translations['en']))
@@ -126,19 +121,17 @@ def quiz(id):
     try:
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        
-        # Fetch question from DB
         cur.execute("SELECT * FROM questions WHERE id = %s", (id,))
         question = cur.fetchone()
         
-        if not question:
-            return redirect(url_for('main.dashboard'))
+        if not question: return redirect(url_for('main.dashboard'))
             
         return render_template('quiz.html', 
                                q=dict(question), 
                                t=translations.get(session.get('lang', 'en'), translations['en']))
     finally:
-        if conn: conn.close()
+        # 3. FIX: USE return_db_connection (Fixes NameError)
+        if conn: return_db_connection(conn)
 
 @quiz_bp.route('/submit_quiz', methods=['POST'])
 def submit_quiz():
@@ -152,20 +145,17 @@ def submit_quiz():
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         
-        # 1. Get correct answer
+        # Check Answer
         cur.execute("SELECT * FROM questions WHERE id = %s", (question_id,))
         question = cur.fetchone()
-        
         is_correct = (selected_option == question['correct_answer'])
         
-        # 2. Record Attempt
-        cur.execute("""
-            INSERT INTO attempts (user_id, question_id, is_correct)
-            VALUES (%s, %s, %s)
-        """, (session['user_id'], question_id, is_correct))
+        # Record Attempt
+        cur.execute("INSERT INTO attempts (user_id, question_id, is_correct) VALUES (%s, %s, %s)", 
+                   (session['user_id'], question_id, is_correct))
         
-        # 3. Update XP if correct
         if is_correct:
+            # Update XP
             cur.execute("UPDATE users SET xp = xp + 10 WHERE id = %s", (session['user_id'],))
             
             # Update Subject Progress
@@ -176,14 +166,26 @@ def submit_quiz():
                 DO UPDATE SET correct_answers = subject_progress.correct_answers + 1;
             """, (session['user_id'], question['subject']))
             
-            # Check Missions
+            # Update Missions (General)
             cur.execute("""
-                UPDATE user_missions 
-                SET progress = progress + 1 
-                WHERE user_id = %s AND completed = FALSE
+                UPDATE user_missions um
+                SET progress = progress + 1
+                FROM missions m
+                WHERE um.mission_id = m.id AND um.user_id = %s AND um.completed = FALSE
+                AND (m.title = 'Daily Scholar' OR m.title = 'Cendekiawan Harian')
             """, (session['user_id'],))
+
+            # Update Missions (Math)
+            if question['subject'] == 'Mathematics':
+                cur.execute("""
+                    UPDATE user_missions um
+                    SET progress = progress + 1
+                    FROM missions m
+                    WHERE um.mission_id = m.id AND um.user_id = %s AND um.completed = FALSE
+                    AND (m.title = 'Math Whiz' OR m.title = 'Pakar Matematik')
+                """, (session['user_id'],))
             
-            # Award Mission XP if completed
+            # Complete Missions
             cur.execute("""
                 UPDATE user_missions um
                 SET completed = TRUE
@@ -192,26 +194,22 @@ def submit_quiz():
                 RETURNING m.xp_reward
             """, (session['user_id'],))
             
-            # Award extra XP from missions
             completed_missions = cur.fetchall()
             for mission in completed_missions:
                 cur.execute("UPDATE users SET xp = xp + %s WHERE id = %s", (mission[0], session['user_id']))
 
         conn.commit()
         
-        # 4. RENDER RESULT (THIS FIXES THE CRASH)
         return render_template('result.html', 
                                is_correct=is_correct, 
                                explanation=question['explanation'],
-                               # --- PASS TRANSLATIONS HERE ---
                                t=translations.get(session.get('lang', 'en'), translations['en']))
 
     except Exception as e:
         print(f"Quiz Error: {e}")
-        # If it crashes, it goes here! That's why you see dashboard instead of result.
         return redirect(url_for('main.dashboard'))
     finally:
-        if conn: conn.close()
+        if conn: return_db_connection(conn)
 
 @quiz_bp.route('/next_question')
 def next_question():
@@ -220,7 +218,7 @@ def next_question():
     current_subject = session.get('current_subject')
     if not current_subject: return redirect(url_for('main.dashboard'))
 
-    # Filter questions list by subject
+    # Filter questions
     subject_questions = [q for q in questions_db if q['subject'] == current_subject]
     
     if not subject_questions: return redirect(url_for('main.dashboard'))
@@ -239,7 +237,7 @@ def history():
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         
         cur.execute("""
-            SELECT a.*, q.question_text, q.subject 
+            SELECT a.*, q.question_text, q.subject, q.explanation, q.correct_answer
             FROM attempts a
             JOIN questions q ON a.question_id = q.id
             WHERE a.user_id = %s
@@ -251,4 +249,5 @@ def history():
                                history=history_data,
                                t=translations.get(session.get('lang', 'en'), translations['en']))
     finally:
-        if conn: conn.close()
+        # 4. FIX: USE return_db_connection (Fixes NameError)
+        if conn: return_db_connection(conn)

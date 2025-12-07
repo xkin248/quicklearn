@@ -2,32 +2,33 @@
    1. THEME VARIABLES
    ========================================= */
 :root {
-    /* --- DEFAULT (DARK MODE) --- */
-    --bg-body: #0f172a;           /* Dark Blue Background */
-    --bg-card: #1e293b;           /* Card Background */
+    /* --- DARK MODE (Default) --- */
+    --bg-body: #0f172a;           /* Dark Blue */
+    --bg-card: #1e293b;           /* Card Blue */
     --bg-input: rgba(15, 23, 42, 0.6);
-    --text-main: #f8fafc;         /* White Text */
-    --text-muted: #94a3b8;        /* Gray Text */
-    --primary: #6366f1;           /* Indigo */
-    --accent: #0ea5e9;            /* Sky Blue */
+    --bg-glass: rgba(255, 255, 255, 0.05); /* White tint for Dark Mode */
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --primary: #6366f1;
+    --accent: #0ea5e9;
     --border: rgba(255, 255, 255, 0.1);
     --success: #22c55e;
     --danger: #ef4444;
-    --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
 
-/* --- LIGHT MODE OVERRIDES --- */
-/* This activates when <html data-theme="light"> */
+/* --- LIGHT MODE --- */
 [data-theme="light"] {
-    --bg-body: #f1f5f9;           /* Light Gray Background */
-    --bg-card: #ffffff;           /* White Card */
+    --bg-body: #f1f5f9;           /* Light Gray */
+    --bg-card: #ffffff;           /* Pure White */
     --bg-input: #f8fafc;
+    --bg-glass: rgba(0, 0, 0, 0.05); /* Dark tint for Light Mode */
     --text-main: #0f172a;         /* Dark Text */
-    --text-muted: #64748b;        /* Dark Gray Text */
-    --primary: #4f46e5;           /* Darker Indigo for contrast */
+    --text-muted: #64748b;        /* Gray Text */
+    --primary: #4f46e5;           /* Darker Indigo */
     --accent: #0284c7;
     --border: #e2e8f0;            /* Light Gray Border */
-    --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 /* =========================================
@@ -39,22 +40,22 @@ body {
     font-family: 'Outfit', sans-serif;
     margin: 0;
     padding: 0;
-    padding-bottom: 90px;
+    padding-bottom: 90px; /* Space for bottom nav */
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Card Style */
+/* Cards */
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 20px;
     padding: 20px;
     margin-bottom: 16px;
-    box-shadow: var(--glass-shadow);
-    transition: background 0.3s ease, border-color 0.3s ease;
+    box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
 }
 
-/* Mobile Inputs */
+/* Inputs */
 input[type="text"], input[type="password"] {
     width: 100%;
     padding: 16px;
@@ -64,57 +65,39 @@ input[type="text"], input[type="password"] {
     color: var(--text-main);
     font-size: 16px;
     outline: none;
-    transition: background 0.3s ease, color 0.3s ease;
+    transition: background 0.3s, border-color 0.3s;
 }
-
-/* Bottom Nav */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: var(--bg-card);
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-around;
-    padding: 12px 10px 25px 10px;
-    z-index: 1000;
-    transition: background 0.3s ease;
-}
-
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var(--text-muted);
-    font-size: 11px;
-    font-weight: 600;
-    width: 60px;
-    text-decoration: none;
-}
-
-.nav-item.active { color: var(--primary); }
-.nav-icon { font-size: 24px; margin-bottom: 4px; }
+input::placeholder { color: var(--text-muted); opacity: 0.7; }
+input:focus { border-color: var(--primary); }
 
 /* Buttons */
 .btn-primary {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 16px;
-    border-radius: 16px;
-    font-size: 16px;
-    font-weight: 700;
-    text-decoration: none;
-    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; background: var(--primary); color: white;
+    border: none; padding: 16px; border-radius: 16px;
+    font-size: 16px; font-weight: 700; cursor: pointer;
     transition: transform 0.1s;
 }
 .btn-primary:active { transform: scale(0.98); }
 
-/* Utilities */
+/* Bottom Nav */
+.bottom-nav {
+    position: fixed; bottom: 0; left: 0; width: 100%;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around;
+    padding: 12px 10px 25px 10px;
+    z-index: 1000;
+    transition: background 0.3s, border-color 0.3s;
+}
+.nav-item {
+    display: flex; flex-direction: column; align-items: center;
+    color: var(--text-muted); font-size: 11px; font-weight: 600;
+    text-decoration: none; width: 60px;
+}
+.nav-item.active { color: var(--primary); }
+.nav-icon { font-size: 24px; margin-bottom: 4px; }
+
+/* Animation */
 .animate-enter { animation: fadeIn 0.4s ease-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

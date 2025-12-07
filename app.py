@@ -1,46 +1,23 @@
-import psycopg2
-from psycopg2 import pool
-from flask import Flask, redirect, url_for, session
+from flask import Flask
 from routes.auth import auth_bp
 from routes.main import main_bp
 from routes.quiz import quiz_bp
 import os
+# IMPORT FROM NEW FILE
+from database import get_db_connection, return_db_connection
 
 app = Flask(__name__)
-# Security Key
 app.secret_key = os.environ.get('SECRET_KEY', '9f3b8d1c2a7e4f6g5h8j9k0l1m2n3o4p')
 
 # ==========================================
-#  1. FAST DATABASE CONNECTION POOL
-# ==========================================
-DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://neondb_owner:npg_zsbQNiH92vkl@ep-floral-hill-a1sq9ye6-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&connect_timeout=30')
-
-# Create a pool of connections (waits for waiters)
-try:
-    db_pool = psycopg2.pool.SimpleConnectionPool(1, 20, DATABASE_URL)
-    if db_pool:
-        print("✅ Fast Connection Pool Created!")
-except Exception as e:
-    print(f"❌ Error creating pool: {e}")
-
-def get_db_connection():
-    """Get a connection from the pool"""
-    return db_pool.getconn()
-
-def return_db_connection(conn):
-    """Return the connection to the pool"""
-    if conn:
-        db_pool.putconn(conn)
-
-# ==========================================
-#  2. REGISTER ROUTES
+#  REGISTER BLUEPRINTS
 # ==========================================
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(main_bp)
 app.register_blueprint(quiz_bp, url_prefix='/quiz')
 
 # ==========================================
-#  3. DATABASE INITIALIZATION (Run on Start)
+#  DATABASE INITIALIZATION
 # ==========================================
 def init_db():
     print("⏳ Checking Database Schema...")
@@ -49,7 +26,7 @@ def init_db():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # 1. Create USERS Table
+        # 1. Users
         cur.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
@@ -61,7 +38,7 @@ def init_db():
             );
         """)
 
-        # 2. Create QUESTIONS Table
+        # 2. Questions
         cur.execute("""
             CREATE TABLE IF NOT EXISTS questions (
                 id INTEGER PRIMARY KEY,
@@ -79,7 +56,7 @@ def init_db():
             );
         """)
 
-        # 3. Create MISSIONS Table
+        # 3. Missions
         cur.execute("""
             CREATE TABLE IF NOT EXISTS missions (
                 id SERIAL PRIMARY KEY,
@@ -91,15 +68,14 @@ def init_db():
                 xp_reward INTEGER
             );
         """)
-
-        # --- AUTO-FIX: Ensure 'is_daily' column exists ---
-        # This line fixes your error by adding the missing column if it's not there
+        
+        # Ensure 'is_daily' column exists
         cur.execute("""
             ALTER TABLE missions 
             ADD COLUMN IF NOT EXISTS is_daily BOOLEAN DEFAULT TRUE;
         """)
 
-        # 4. Create USER_MISSIONS Table
+        # 4. User Missions
         cur.execute("""
             CREATE TABLE IF NOT EXISTS user_missions (
                 id SERIAL PRIMARY KEY,
@@ -111,7 +87,7 @@ def init_db():
             );
         """)
 
-        # 5. Create ATTEMPTS Table
+        # 5. Attempts
         cur.execute("""
             CREATE TABLE IF NOT EXISTS attempts (
                 id SERIAL PRIMARY KEY,
@@ -122,7 +98,7 @@ def init_db():
             );
         """)
 
-        # 6. Create SUBJECT_PROGRESS Table
+        # 6. Subject Progress
         cur.execute("""
             CREATE TABLE IF NOT EXISTS subject_progress (
                 id SERIAL PRIMARY KEY,
@@ -137,9 +113,7 @@ def init_db():
 
         conn.commit()
 
-        # --- SEED DATA (Updates Questions & Missions) ---
-        
-        # Sync Questions from quiz.py
+        # --- SEED DATA ---
         from routes.quiz import questions_db
         if len(questions_db) > 0:
             questions_data = [
@@ -167,7 +141,6 @@ def init_db():
             """
             cur.executemany(sql, questions_data)
 
-        # Seed Missions if missing
         cur.execute("SELECT COUNT(*) FROM missions")
         if cur.fetchone()[0] == 0:
             print("   - Seeding Missions...")

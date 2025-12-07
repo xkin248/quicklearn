@@ -1,116 +1,62 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-    /* Page Title */
-    .page-header {
-        margin-bottom: 20px;
-    }
-    .page-title {
-        font-size: 24px;
-        font-weight: bold;
-        margin: 0;
-    }
-    .page-subtitle {
-        font-size: 13px;
-        color: #94a3b8;
-        margin-top: 5px;
-    }
+<div class="container" style="max-width: 600px;">
+    
+    <div style="margin-bottom: 24px; margin-top: 10px;">
+        <h1 style="margin: 0; font-size: 28px; font-weight: 800;">{{ t.history }}</h1>
+        <p style="color: var(--text-muted); margin: 5px 0 0 0;">Tap an item to see details</p>
+    </div>
 
-    /* History Cards */
-    .history-list {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .history-card {
-        background: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 16px;
-        padding: 16px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .history-content {
-        flex: 1;
-        margin-right: 15px;
-    }
-
-    .history-subject {
-        font-size: 11px;
-        text-transform: uppercase;
-        font-weight: bold;
-        color: #94a3b8;
-        margin-bottom: 4px;
-        display: inline-block;
-        padding: 2px 6px;
-        border-radius: 4px;
-        background: rgba(255,255,255,0.05);
-    }
-
-    .history-question {
-        font-size: 15px;
-        font-weight: 500;
-        color: white;
-        line-height: 1.4;
-    }
-
-    /* Status Icons */
-    .status-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        flex-shrink: 0;
-    }
-    .correct { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .incorrect { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 40px 20px;
-        color: #94a3b8;
-    }
-    .empty-icon { font-size: 40px; margin-bottom: 10px; display: block; opacity: 0.5; }
-</style>
-
-<div class="page-header">
-    <h1 class="page-title">Learning History</h1>
-    <div class="page-subtitle">Your recent quiz attempts</div>
-</div>
-
-<div class="history-list">
     {% if history|length == 0 %}
-        <div class="empty-state">
-            <span class="empty-icon">📝</span>
-            <p>No quizzes taken yet.</p>
-            <a href="{{ url_for('main.index') }}" style="color: #3b82f6; text-decoration: none;">Start Learning</a>
+        <div class="card" style="text-align: center; padding: 40px 20px;">
+            <div style="font-size: 40px; margin-bottom: 15px; opacity: 0.5;">📝</div>
+            <h3 style="margin: 0 0 10px 0;">No quizzes yet</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Start a quiz to see your progress here.</p>
+            <a href="{{ url_for('main.subjects_page') }}" class="btn-primary" style="display: inline-flex; width: auto; padding: 12px 24px;">Start Learning</a>
         </div>
     {% else %}
-        {% for item in history %}
-        <div class="history-card">
-            <div class="history-content">
-                <span class="history-subject">{{ item.subject }}</span>
-                <div class="history-question">{{ item.question }}</div>
-            </div>
-            
-            {% if item.is_correct %}
-                <div class="status-icon correct">✓</div>
-            {% else %}
-                <div class="status-icon incorrect">✕</div>
-            {% endif %}
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            {% for item in history %}
+            <details class="history-item">
+                <summary class="card" style="margin: 0; padding: 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; list-style: none;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="min-width: 40px; height: 40px; border-radius: 12px; 
+                                    background: {{ 'rgba(34, 197, 94, 0.1)' if item.is_correct else 'rgba(239, 68, 68, 0.1)' }}; 
+                                    color: {{ 'var(--success)' if item.is_correct else 'var(--danger)' }};
+                                    display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold;">
+                            {{ '✓' if item.is_correct else '✕' }}
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">{{ item.subject }}</div>
+                            <div style="font-weight: 600; font-size: 14px; margin-top: 2px;">{{ item.question_text[:35] }}...</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-muted);">{{ item.timestamp.strftime('%d %b') }} ▼</div>
+                </summary>
+
+                <div class="card" style="margin-top: -10px; border-top: none; border-radius: 0 0 20px 20px; background: var(--bg-body); border: 1px solid var(--border); padding: 20px;">
+                    <p style="font-weight: 600; font-size: 15px; margin-top: 0;">{{ item.question_text }}</p>
+                    <div style="margin-bottom: 15px; padding: 10px; border-radius: 8px; background: {{ 'rgba(34, 197, 94, 0.1)' if item.is_correct else 'rgba(239, 68, 68, 0.1)' }}; color: {{ 'var(--success)' if item.is_correct else 'var(--danger)' }}; font-size: 13px; font-weight: 700;">
+                        {% if item.is_correct %}
+                            You answered correctly!
+                        {% else %}
+                            Incorrect. <span style="color: var(--text-main); font-weight: 400;">Answer: <b>{{ item.correct_answer }}</b></span>
+                        {% endif %}
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Explanation</div>
+                    <div style="font-size: 14px; line-height: 1.5; color: var(--text-muted);">{{ item.explanation }}</div>
+                </div>
+            </details>
+            {% endfor %}
         </div>
-        {% endfor %}
     {% endif %}
 </div>
-
-<div style="height: 20px;"></div>
-
+<style>
+    details > summary { list-style: none; }
+    details > summary::-webkit-details-marker { display: none; }
+    details[open] summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 1px solid var(--border); }
+    details[open] div { animation: slideDown 0.2s ease-out; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
 {% endblock %}
