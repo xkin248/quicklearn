@@ -98,6 +98,10 @@ questions_db = [
     {"id": 410, "subject": "English", "difficulty": "Medium", "question_text": "I _____ (sleep) well.", "option_a": "sleeped", "option_b": "slept", "option_c": "sleeping", "option_d": "sleeps", "correct_answer": "slept", "explanation": "Sleep -> Slept."}
 ]
 
+# ==========================================
+#  ROUTES
+# ==========================================
+
 @quiz_bp.route('/start_subject/<subject_name>')
 def start_subject(subject_name):
     if 'user_id' not in session: return redirect(url_for('auth.login'))
@@ -195,13 +199,16 @@ def submit_quiz():
 
         conn.commit()
         
+        # 4. RENDER RESULT (THIS FIXES THE CRASH)
         return render_template('result.html', 
                                is_correct=is_correct, 
                                explanation=question['explanation'],
+                               # --- PASS TRANSLATIONS HERE ---
                                t=translations.get(session.get('lang', 'en'), translations['en']))
 
     except Exception as e:
         print(f"Quiz Error: {e}")
+        # If it crashes, it goes here! That's why you see dashboard instead of result.
         return redirect(url_for('main.dashboard'))
     finally:
         if conn: conn.close()
